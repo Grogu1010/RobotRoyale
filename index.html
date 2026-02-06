@@ -10,18 +10,21 @@
     <div id="app">
       <header class="hud top">
         <div class="wall-card">
-          <span>Player Wall</span>
+          <span class="label">Player Wall</span>
           <div class="bar"><div id="player-wall-bar" class="fill player"></div></div>
-          <span id="player-wall-hp">2500 / 2500</span>
+          <span id="player-wall-hp" class="value">2500 / 2500</span>
         </div>
+
         <div class="center-info">
+          <p class="kicker">PvAI Prototype</p>
           <h1>Robot Royale</h1>
           <p id="status">Destroy enemy wall, then cross with a Walker.</p>
         </div>
+
         <div class="wall-card">
-          <span>AI Wall</span>
+          <span class="label">AI Wall</span>
           <div class="bar"><div id="ai-wall-bar" class="fill ai"></div></div>
-          <span id="ai-wall-hp">2500 / 2500</span>
+          <span id="ai-wall-hp" class="value">2500 / 2500</span>
         </div>
       </header>
 
@@ -30,13 +33,18 @@
       </main>
 
       <footer class="hud bottom">
-        <div class="bolts">Bolts: <strong id="player-bolts">200</strong> / 600</div>
-        <div class="unit-buttons">
-          <button data-unit="walker">Walker (100)</button>
-          <button data-unit="ranger">Ranger (125)</button>
-          <button data-unit="marker">Marker (125)</button>
+        <div class="bolts-card">⚡ Bolts <strong id="player-bolts">200</strong><span>/ 600</span></div>
+
+        <div class="unit-panel">
+          <p class="panel-title">Deploy Units</p>
+          <div class="unit-buttons">
+            <button data-unit="walker">Walker <span>100</span></button>
+            <button data-unit="ranger">Ranger <span>125</span></button>
+            <button data-unit="marker">Marker <span>125</span></button>
+          </div>
         </div>
-        <button id="restart">Restart</button>
+
+        <button id="restart" class="restart-btn">Restart Match</button>
       </footer>
     </div>
     <script src="script.js"></script>
