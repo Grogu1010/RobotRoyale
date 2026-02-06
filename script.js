@@ -9,9 +9,40 @@ const ECON_TICK = 4;
 const ECON_GAIN = 50;
 
 const UNIT_DEFS = {
-  walker: { cost: 100, hp: 750, speed: 0.5, damage: 150, attackRate: 1, moving: true, letter: "W", color: "#67d17a" },
-  ranger: { cost: 125, hp: 1500, damage: 75, attackRate: 0.5, moving: false, letter: "R", color: "#73a8ff" },
-  marker: { cost: 125, hp: 300, moving: false, letter: "M", color: "#f0a255", laserDps: 250, deathExplosion: 300 },
+  walker: {
+    cost: 100,
+    hp: 750,
+    speed: 0.5,
+    damage: 150,
+    attackRate: 1,
+    moving: true,
+    letter: "W",
+    color: "#67d17a",
+    role: "Frontline breaker",
+    description: "Walkers march forward and smash whatever blocks the lane. Best for finishing games once a wall falls.",
+  },
+  ranger: {
+    cost: 125,
+    hp: 1500,
+    damage: 75,
+    attackRate: 0.5,
+    moving: false,
+    letter: "R",
+    color: "#73a8ff",
+    role: "Lane control",
+    description: "Rangers lock down their lane from range and steadily chip units and walls.",
+  },
+  marker: {
+    cost: 125,
+    hp: 300,
+    moving: false,
+    letter: "M",
+    color: "#f0a255",
+    laserDps: 250,
+    deathExplosion: 300,
+    role: "Cross-lane disruptor",
+    description: "Markers burn enemies in adjacent lanes, then explode on death to punish clustered pushes.",
+  },
 };
 
 const canvas = document.getElementById("game");
@@ -23,9 +54,16 @@ const aiWallHpEl = document.getElementById("ai-wall-hp");
 const playerWallBar = document.getElementById("player-wall-bar");
 const aiWallBar = document.getElementById("ai-wall-bar");
 
+const menuScreen = document.getElementById("menu-screen");
+const gameScreen = document.getElementById("game-screen");
+const botBookScreen = document.getElementById("bot-book-screen");
+const botListEl = document.getElementById("bot-list");
+const botDetailsEl = document.getElementById("bot-details");
+
 let selectedUnit = "walker";
-let now = 0;
+let selectedBot = "walker";
 let lastTs = performance.now();
+let isGameActive = false;
 
 const state = {
   over: false,
@@ -41,6 +79,14 @@ const state = {
     ai: { hp: MAX_WALL_HP, alive: true, col: AI_WALL_COL },
   },
 };
+
+function showScreen(name) {
+  menuScreen.classList.toggle("active", name === "menu");
+  gameScreen.classList.toggle("active", name === "game");
+  botBookScreen.classList.toggle("active", name === "book");
+  isGameActive = name === "game";
+  if (isGameActive) render();
+}
 
 function reset() {
   state.over = false;
@@ -75,7 +121,7 @@ function makeUnit(type, side, lane, col) {
   };
 }
 
-function canPlace(side, lane, col, type) {
+function canPlace(side, lane, col) {
   if (lane < 0 || lane >= LANES || col < 0 || col >= COLS) return false;
   const inSide = side === "player" ? col < HALF : col >= HALF;
   if (!inSide) return false;
@@ -84,7 +130,7 @@ function canPlace(side, lane, col, type) {
 
 function placeUnit(side, type, lane, col) {
   const def = UNIT_DEFS[type];
-  if (!def || !canPlace(side, lane, col, type)) return false;
+  if (!def || !canPlace(side, lane, col)) return false;
   if (side === "player") {
     if (state.playerBolts < def.cost) return false;
     state.playerBolts -= def.cost;
@@ -101,8 +147,7 @@ function enemySide(side) {
 }
 
 function update(dt) {
-  if (state.over) return;
-  now += dt;
+  if (!isGameActive || state.over) return;
   state.econTimer += dt;
   state.aiThinkTimer += dt;
 
@@ -203,11 +248,7 @@ function updateRanger(u, def) {
 
 function updateMarker(u, def, dt) {
   const targets = state.units.filter(
-    (e) =>
-      e.alive &&
-      e.side !== u.side &&
-      e.lane !== u.lane &&
-      Math.abs(e.x - u.x) <= 0.45
+    (e) => e.alive && e.side !== u.side && e.lane !== u.lane && Math.abs(e.x - u.x) <= 0.45
   );
   for (const t of targets) t.hp -= def.laserDps * dt;
 }
@@ -277,6 +318,7 @@ function syncHud() {
 }
 
 function render() {
+  if (!gameScreen.classList.contains("active")) return;
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.getBoundingClientRect();
   canvas.width = Math.floor(rect.width * dpr);
@@ -318,8 +360,8 @@ function render() {
   ctx.lineTo(HALF * cellW, h);
   ctx.stroke();
 
-  drawWall("player", cellW, cellH, w, h);
-  drawWall("ai", cellW, cellH, w, h);
+  drawWall("player", cellW, h);
+  drawWall("ai", cellW, h);
 
   for (const u of state.units) {
     if (!u.alive) continue;
@@ -347,7 +389,7 @@ function render() {
   }
 }
 
-function drawWall(side, cellW, cellH, w, h) {
+function drawWall(side, cellW, h) {
   const wall = state.walls[side];
   const x = side === "player" ? wall.col * cellW : (wall.col + 1) * cellW;
   ctx.fillStyle = side === "player" ? "#3c8f45" : "#9a4444";
@@ -355,8 +397,45 @@ function drawWall(side, cellW, cellH, w, h) {
   if (wall.alive) ctx.fillRect(x - width / 2, 0, width, h);
 }
 
+function renderBotBook() {
+  botListEl.innerHTML = "";
+  for (const [key, def] of Object.entries(UNIT_DEFS)) {
+    const entry = document.createElement("button");
+    entry.className = `bot-entry ${selectedBot === key ? "active" : ""}`;
+    entry.innerHTML = `<strong>${capitalize(key)}</strong><p>${def.role}</p>`;
+    entry.addEventListener("pointerdown", () => {
+      selectedBot = key;
+      renderBotBook();
+    });
+    botListEl.appendChild(entry);
+  }
+
+  const def = UNIT_DEFS[selectedBot];
+  const statItems = [
+    ["Cost", def.cost],
+    ["HP", def.hp],
+    ["Damage", def.damage ?? "-"] ,
+    ["Attack Rate", def.attackRate ? `${def.attackRate}/s` : "-"],
+    ["Speed", def.speed ?? "-"],
+    ["Laser DPS", def.laserDps ?? "-"],
+    ["Death Blast", def.deathExplosion ?? "-"],
+  ];
+
+  botDetailsEl.innerHTML = `
+    <h3>${capitalize(selectedBot)}</h3>
+    <p>${def.description}</p>
+    <div class="bot-stats">
+      ${statItems.map(([label, val]) => `<div class="bot-stat"><strong>${label}:</strong> ${val}</div>`).join("")}
+    </div>
+  `;
+}
+
+function capitalize(value) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 function handlePlace(ev) {
-  if (state.over) return;
+  if (!isGameActive || state.over) return;
   const rect = canvas.getBoundingClientRect();
   const px = ev.clientX - rect.left;
   const py = ev.clientY - rect.top;
@@ -368,6 +447,7 @@ function handlePlace(ev) {
 }
 
 canvas.addEventListener("pointerdown", handlePlace);
+
 document.querySelectorAll(".unit-buttons button").forEach((btn) => {
   btn.addEventListener("pointerdown", () => {
     selectedUnit = btn.dataset.unit;
@@ -375,12 +455,29 @@ document.querySelectorAll(".unit-buttons button").forEach((btn) => {
     btn.classList.add("active");
   });
 });
+
 document.querySelector('.unit-buttons button[data-unit="walker"]').classList.add("active");
 document.getElementById("restart").addEventListener("pointerdown", reset);
 
+document.getElementById("fight-btn").addEventListener("pointerdown", () => {
+  reset();
+  syncHud();
+  showScreen("game");
+});
+
+document.getElementById("bot-book-btn").addEventListener("pointerdown", () => {
+  renderBotBook();
+  showScreen("book");
+});
+
+document.getElementById("book-back").addEventListener("pointerdown", () => showScreen("menu"));
+document.getElementById("menu-from-game").addEventListener("pointerdown", () => showScreen("menu"));
+
+window.addEventListener("resize", render);
+
 reset();
 syncHud();
-render();
+showScreen("menu");
 
 function frame(ts) {
   const dt = Math.min(0.1, (ts - lastTs) / 1000);
