@@ -7,46 +7,78 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div id="app">
-      <header class="hud top">
-        <div class="wall-card">
-          <span class="label">Player Wall</span>
-          <div class="bar"><div id="player-wall-bar" class="fill player"></div></div>
-          <span id="player-wall-hp" class="value">2500 / 2500</span>
+    <div id="menu-screen" class="screen active">
+      <div class="menu-card">
+        <p class="kicker">PvAI Prototype</p>
+        <h1>Robot Royale</h1>
+        <p class="menu-copy">Choose your next move.</p>
+        <div class="menu-actions">
+          <button id="fight-btn" class="menu-btn">FIGHT!</button>
+          <button id="bot-book-btn" class="menu-btn alt">Bot Book</button>
         </div>
-
-        <div class="center-info">
-          <p class="kicker">PvAI Prototype</p>
-          <h1>Robot Royale</h1>
-          <p id="status">Destroy enemy wall, then cross with a Walker.</p>
-        </div>
-
-        <div class="wall-card">
-          <span class="label">AI Wall</span>
-          <div class="bar"><div id="ai-wall-bar" class="fill ai"></div></div>
-          <span id="ai-wall-hp" class="value">2500 / 2500</span>
-        </div>
-      </header>
-
-      <main>
-        <canvas id="game" width="1280" height="720"></canvas>
-      </main>
-
-      <footer class="hud bottom">
-        <div class="bolts-card">⚡ Bolts <strong id="player-bolts">200</strong><span>/ 600</span></div>
-
-        <div class="unit-panel">
-          <p class="panel-title">Deploy Units</p>
-          <div class="unit-buttons">
-            <button data-unit="walker">Walker <span>100</span></button>
-            <button data-unit="ranger">Ranger <span>125</span></button>
-            <button data-unit="marker">Marker <span>125</span></button>
-          </div>
-        </div>
-
-        <button id="restart" class="restart-btn">Restart Match</button>
-      </footer>
+      </div>
     </div>
+
+    <div id="bot-book-screen" class="screen">
+      <div class="book-card">
+        <div class="book-header">
+          <h2>Bot Book</h2>
+          <button id="book-back" class="menu-btn small">Back to Menu</button>
+        </div>
+
+        <div class="book-layout">
+          <aside id="bot-list" class="bot-list"></aside>
+          <section id="bot-details" class="bot-details"></section>
+        </div>
+      </div>
+    </div>
+
+    <div id="game-screen" class="screen">
+      <div id="app">
+        <header class="hud top">
+          <div class="wall-card">
+            <span class="label">Player Wall</span>
+            <div class="bar"><div id="player-wall-bar" class="fill player"></div></div>
+            <span id="player-wall-hp" class="value">2500 / 2500</span>
+          </div>
+
+          <div class="center-info">
+            <p class="kicker">PvAI Prototype</p>
+            <h1>Robot Royale</h1>
+            <p id="status">Destroy enemy wall, then cross with a Walker.</p>
+          </div>
+
+          <div class="wall-card">
+            <span class="label">AI Wall</span>
+            <div class="bar"><div id="ai-wall-bar" class="fill ai"></div></div>
+            <span id="ai-wall-hp" class="value">2500 / 2500</span>
+          </div>
+        </header>
+
+        <main>
+          <canvas id="game" width="1280" height="720"></canvas>
+        </main>
+
+        <footer class="hud bottom">
+          <div class="bolts-card">⚡ Bolts <strong id="player-bolts">200</strong><span>/ 600</span></div>
+
+          <div class="unit-panel">
+            <p class="panel-title">Deploy Units</p>
+            <div class="unit-buttons">
+              <button data-unit="walker">Walker <span>100</span></button>
+              <button data-unit="ranger">Ranger <span>125</span></button>
+              <button data-unit="marker">Marker <span>125</span></button>
+            </div>
+          </div>
+
+          <div class="game-actions">
+            <button id="menu-from-game" class="restart-btn">Main Menu</button>
+            <button id="restart" class="restart-btn">Restart Match</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
     <script src="script.js"></script>
   </body>
 </html>
