@@ -1,6 +1,8 @@
 const LANES = 5;
 const COLS = 16;
 const HALF = 8;
+const PLAYER_WALL_COL = 0;
+const AI_WALL_COL = COLS - 1;
 const MAX_WALL_HP = 2500;
 const BOLT_CAP = 600;
 const ECON_TICK = 4;
@@ -35,8 +37,8 @@ const state = {
   econTimer: 0,
   aiThinkTimer: 0,
   walls: {
-    player: { hp: MAX_WALL_HP, alive: true, col: HALF - 1 },
-    ai: { hp: MAX_WALL_HP, alive: true, col: HALF },
+    player: { hp: MAX_WALL_HP, alive: true, col: PLAYER_WALL_COL },
+    ai: { hp: MAX_WALL_HP, alive: true, col: AI_WALL_COL },
   },
 };
 
@@ -49,8 +51,8 @@ function reset() {
   state.aiBolts = 200;
   state.econTimer = 0;
   state.aiThinkTimer = 0;
-  state.walls.player = { hp: MAX_WALL_HP, alive: true, col: HALF - 1 };
-  state.walls.ai = { hp: MAX_WALL_HP, alive: true, col: HALF };
+  state.walls.player = { hp: MAX_WALL_HP, alive: true, col: PLAYER_WALL_COL };
+  state.walls.ai = { hp: MAX_WALL_HP, alive: true, col: AI_WALL_COL };
   setStatus("Destroy enemy wall, then cross with a Walker.");
 }
 
