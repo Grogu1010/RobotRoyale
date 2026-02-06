@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Ranger robot">
+  <style>
+    :root {
+      --shell: #f5f7ff;
+      --shell-dark: #c7d4e8;
+      --accent: #6fe6ff;
+      --accent-deep: #1f8cff;
+      --trim: #1b2338;
+      --core: #0b0f1a;
+    }
+    .float { animation: float 3s ease-in-out infinite; transform-origin: 120px 140px; }
+    .string { animation: shoot 1.2s ease-in-out infinite; transform-origin: 190px 130px; }
+    .arrow { animation: arrow-glow 1.2s ease-in-out infinite; }
+    .glow { animation: pulse 2s ease-in-out infinite; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    @keyframes shoot {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(-4deg); }
+    }
+    @keyframes arrow-glow {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+  </style>
+  <g class="float">
+    <ellipse cx="120" cy="206" rx="70" ry="12" fill="#0a1326" opacity="0.5" />
+    <g>
+      <circle cx="120" cy="94" r="46" fill="var(--shell)" stroke="var(--trim)" stroke-width="4" />
+      <rect x="78" y="88" width="84" height="34" rx="16" fill="var(--core)" />
+      <rect x="90" y="96" width="22" height="20" rx="8" fill="var(--accent)" class="glow" />
+      <rect x="128" y="96" width="22" height="20" rx="8" fill="var(--accent)" class="glow" />
+      <rect x="70" y="80" width="20" height="32" rx="10" fill="var(--accent-deep)" />
+      <rect x="150" y="80" width="20" height="32" rx="10" fill="var(--accent-deep)" />
+      <polygon points="120,36 132,70 108,70" fill="var(--accent)" stroke="var(--trim)" stroke-width="3" />
+    </g>
+    <g>
+      <rect x="82" y="132" width="76" height="54" rx="20" fill="var(--shell)" stroke="var(--trim)" stroke-width="4" />
+      <rect x="110" y="132" width="20" height="54" rx="10" fill="var(--accent-deep)" />
+      <rect x="90" y="172" width="60" height="16" rx="8" fill="var(--shell-dark)" />
+    </g>
+    <g>
+      <rect x="54" y="130" width="28" height="52" rx="14" fill="var(--shell-dark)" stroke="var(--trim)" stroke-width="4" />
+      <rect x="158" y="130" width="28" height="52" rx="14" fill="var(--shell-dark)" stroke="var(--trim)" stroke-width="4" />
+      <rect x="36" y="152" width="26" height="36" rx="12" fill="var(--shell)" stroke="var(--trim)" stroke-width="4" />
+      <rect x="178" y="152" width="26" height="36" rx="12" fill="var(--shell)" stroke="var(--trim)" stroke-width="4" />
+    </g>
+    <g class="string">
+      <path d="M204 108 C218 130 218 150 204 170" fill="none" stroke="var(--shell)" stroke-width="10" />
+      <path d="M36 108 C22 130 22 150 36 170" fill="none" stroke="var(--shell)" stroke-width="10" />
+      <line x1="36" y1="108" x2="204" y2="170" stroke="var(--accent)" stroke-width="3" />
+      <line x1="36" y1="170" x2="204" y2="108" stroke="var(--accent)" stroke-width="3" />
+      <g class="arrow">
+        <line x1="90" y1="138" x2="180" y2="138" stroke="var(--accent)" stroke-width="6" />
+        <polygon points="180,126 208,138 180,150" fill="var(--accent)" />
+      </g>
+    </g>
+    <g>
+      <rect x="40" y="118" width="42" height="32" rx="10" fill="var(--trim)" />
+      <rect x="158" y="118" width="42" height="32" rx="10" fill="var(--trim)" />
+      <circle cx="50" cy="120" r="6" fill="var(--accent)" />
+      <circle cx="60" cy="118" r="6" fill="var(--accent)" />
+      <circle cx="70" cy="116" r="6" fill="var(--accent)" />
+    </g>
+  </g>
+</svg>

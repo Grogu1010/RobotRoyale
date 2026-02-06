@@ -73,6 +73,49 @@ const UNIT_DEFS = {
   },
 };
 
+const UNIT_ART = {
+  walker: {
+    player: "assets/robots/walker.svg",
+    ai: "assets/robots/walker-enemy.svg",
+    width: 240,
+    height: 240,
+  },
+  miniWalker: {
+    player: "assets/robots/mini-walker.svg",
+    ai: "assets/robots/mini-walker-enemy.svg",
+    width: 220,
+    height: 220,
+  },
+  ranger: {
+    player: "assets/robots/ranger.svg",
+    ai: "assets/robots/ranger-enemy.svg",
+    width: 240,
+    height: 240,
+  },
+  marker: {
+    player: "assets/robots/marker.svg",
+    ai: "assets/robots/marker-enemy.svg",
+    width: 180,
+    height: 260,
+  },
+  teleZoom: {
+    player: "assets/robots/tele-zoom.svg",
+    ai: "assets/robots/tele-zoom-enemy.svg",
+    width: 220,
+    height: 220,
+  },
+};
+
+const unitArtImages = Object.fromEntries(
+  Object.entries(UNIT_ART).map(([key, art]) => {
+    const playerImg = new Image();
+    playerImg.src = art.player;
+    const aiImg = new Image();
+    aiImg.src = art.ai;
+    return [key, { player: playerImg, ai: aiImg }];
+  })
+);
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const statusEl = document.getElementById("status");
@@ -422,17 +465,18 @@ function render() {
     const def = UNIT_DEFS[u.type];
     const x = (u.x + 0.5) * cellW;
     const y = (u.lane + 0.5) * cellH;
+    if (!drawUnitArt(u, x, y, Math.min(cellW, cellH) * 0.9)) {
+      ctx.fillStyle = u.side === "player" ? def.color : "#ff7c7c";
+      ctx.beginPath();
+      ctx.arc(x, y, Math.min(cellW, cellH) * 0.28, 0, Math.PI * 2);
+      ctx.fill();
 
-    ctx.fillStyle = u.side === "player" ? def.color : "#ff7c7c";
-    ctx.beginPath();
-    ctx.arc(x, y, Math.min(cellW, cellH) * 0.28, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = "#001022";
-    ctx.font = `${Math.floor(cellH * 0.24)}px sans-serif`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(def.letter, x, y);
+      ctx.fillStyle = "#001022";
+      ctx.font = `${Math.floor(cellH * 0.24)}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(def.letter, x, y);
+    }
 
     const hpW = cellW * 0.62;
     const hpH = 5;
@@ -451,6 +495,22 @@ function drawWall(side, cellW, h) {
   if (wall.alive) ctx.fillRect(x - width / 2, 0, width, h);
 }
 
+function drawUnitArt(unit, x, y, size) {
+  const art = UNIT_ART[unit.type];
+  if (!art) return false;
+  const image = unitArtImages[unit.type]?.[unit.side];
+  if (!image || !image.complete || image.naturalWidth === 0) return false;
+  const scale = size / Math.max(art.width, art.height);
+  const drawW = art.width * scale;
+  const drawH = art.height * scale;
+  ctx.save();
+  ctx.translate(x, y);
+  if (unit.side === "ai") ctx.scale(-1, 1);
+  ctx.drawImage(image, -drawW / 2, -drawH / 2, drawW, drawH);
+  ctx.restore();
+  return true;
+}
+
 function renderBotBook() {
   botListEl.innerHTML = "";
   for (const [key, def] of Object.entries(UNIT_DEFS)) {
@@ -465,6 +525,7 @@ function renderBotBook() {
   }
 
   const def = UNIT_DEFS[selectedBot];
+  const art = UNIT_ART[selectedBot];
   const statItems = [
     ["Cost", def.cost],
     ["HP", def.hp],
@@ -481,6 +542,20 @@ function renderBotBook() {
   botDetailsEl.innerHTML = `
     <h3>${capitalize(selectedBot)}</h3>
     <p>${def.description}</p>
+    ${
+      art
+        ? `<div class="bot-art">
+      <figure>
+        <img src="${art.player}" alt="${capitalize(selectedBot)} player art" loading="lazy" />
+        <figcaption>Player</figcaption>
+      </figure>
+      <figure>
+        <img src="${art.ai}" alt="${capitalize(selectedBot)} enemy art" loading="lazy" />
+        <figcaption>Enemy</figcaption>
+      </figure>
+    </div>`
+        : ""
+    }
     <div class="bot-stats">
       ${statItems.map(([label, val]) => `<div class="bot-stat"><strong>${label}:</strong> ${val}</div>`).join("")}
     </div>
