@@ -19,7 +19,21 @@ const UNIT_DEFS = {
     letter: "W",
     color: "#67d17a",
     role: "Frontline breaker",
+    unlock: "Default",
     description: "Walkers march forward and smash whatever blocks the lane. Best for finishing games once a wall falls.",
+  },
+  miniWalker: {
+    cost: 50,
+    hp: 250,
+    speed: 1,
+    damage: 75,
+    attackRate: 4,
+    moving: true,
+    letter: "MW",
+    color: "#90ffa0",
+    role: "Hyper rush",
+    unlock: "1 win",
+    description: "Mini Walkers swarm fast. They hit four times as quickly at half Walker damage, move twice as fast, and trade durability for speed.",
   },
   ranger: {
     cost: 125,
@@ -167,7 +181,7 @@ function update(dt) {
     const def = UNIT_DEFS[u.type];
     u.cooldown = Math.max(0, u.cooldown - dt);
 
-    if (u.type === "walker") updateWalker(u, def, dt);
+    if (u.type === "walker" || u.type === "miniWalker") updateWalker(u, def, dt);
     else if (u.type === "ranger") updateRanger(u, def);
     else if (u.type === "marker") updateMarker(u, def, dt);
   }
@@ -271,7 +285,7 @@ function resolveDeaths() {
 
 function checkWin() {
   for (const u of state.units) {
-    if (!u.alive || u.type !== "walker") continue;
+    if (!u.alive || (u.type !== "walker" && u.type !== "miniWalker")) continue;
     if (u.side === "player" && !state.walls.ai.alive && u.x >= COLS - 0.05) {
       state.over = true;
       state.winner = "player";
@@ -288,7 +302,7 @@ function aiAct() {
   if (state.over) return;
   const threats = new Array(LANES).fill(0);
   for (const u of state.units) {
-    if (!u.alive || u.side !== "player" || u.type !== "walker") continue;
+    if (!u.alive || u.side !== "player" || (u.type !== "walker" && u.type !== "miniWalker")) continue;
     threats[u.lane] += 1;
   }
   const dangerLane = threats.indexOf(Math.max(...threats));
@@ -302,10 +316,11 @@ function aiAct() {
     }
   }
 
-  if (state.aiBolts >= 100) {
+  if (state.aiBolts >= 50) {
     const lane = Math.floor(Math.random() * LANES);
     const col = 14;
-    placeUnit("ai", "walker", lane, col);
+    const useMiniWalker = state.aiBolts >= UNIT_DEFS.walker.cost ? Math.random() < 0.35 : true;
+    placeUnit("ai", useMiniWalker ? "miniWalker" : "walker", lane, col);
   }
 }
 
@@ -417,6 +432,7 @@ function renderBotBook() {
     ["Damage", def.damage ?? "-"] ,
     ["Attack Rate", def.attackRate ? `${def.attackRate}/s` : "-"],
     ["Speed", def.speed ?? "-"],
+    ["Unlock", def.unlock ?? "Default"],
     ["Laser DPS", def.laserDps ?? "-"],
     ["Death Blast", def.deathExplosion ?? "-"],
   ];
