@@ -54,7 +54,8 @@ body {
 }
 
 #menu-screen,
-#bot-book-screen {
+#bot-book-screen,
+#update-log-screen {
   display: none;
   place-items: center;
   padding: 1rem;
@@ -62,7 +63,8 @@ body {
 }
 
 #menu-screen.active,
-#bot-book-screen.active {
+#bot-book-screen.active,
+#update-log-screen.active {
   display: grid;
 }
 
@@ -153,6 +155,29 @@ body {
 
 .bot-details h3 {
   margin-top: 0;
+}
+
+.update-log-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.update-entry {
+  border: 1px solid #38588d;
+  border-radius: 0.65rem;
+  background: #0f1c36;
+  padding: 0.75rem 0.85rem;
+}
+
+.update-entry h3 {
+  margin: 0 0 0.45rem;
+  color: #9dd0ff;
+}
+
+.update-entry ul {
+  margin: 0;
+  padding-left: 1.15rem;
+  color: #d3e3ff;
 }
 
 .bot-stats {
