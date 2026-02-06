@@ -24,7 +24,7 @@ const UNIT_DEFS = {
   },
   miniWalker: {
     cost: 50,
-    hp: 250,
+    hp: 175,
     speed: 1,
     damage: 75,
     attackRate: 4,
@@ -57,6 +57,20 @@ const UNIT_DEFS = {
     role: "Cross-lane disruptor",
     description: "Markers burn enemies in adjacent lanes, then explode on death to punish clustered pushes.",
   },
+  teleZoom: {
+    cost: 200,
+    hp: 200,
+    speed: 2 / 3,
+    damage: 0,
+    attackRate: 0,
+    moving: true,
+    letter: "TZ",
+    color: "#a784ff",
+    teleportDelay: 1,
+    teleportBlast: 200,
+    role: "Win-condition infiltrator",
+    description: "Tele-Zoom idles for 1 second, teleports to 3 tiles from the enemy wall, blasts a 3x3 area for 200 damage once, then advances 1 tile every 1.5s.",
+  },
 };
 
 const canvas = document.getElementById("game");
@@ -71,6 +85,7 @@ const aiWallBar = document.getElementById("ai-wall-bar");
 const menuScreen = document.getElementById("menu-screen");
 const gameScreen = document.getElementById("game-screen");
 const botBookScreen = document.getElementById("bot-book-screen");
+const updateLogScreen = document.getElementById("update-log-screen");
 const botListEl = document.getElementById("bot-list");
 const botDetailsEl = document.getElementById("bot-details");
 
@@ -98,6 +113,7 @@ function showScreen(name) {
   menuScreen.classList.toggle("active", name === "menu");
   gameScreen.classList.toggle("active", name === "game");
   botBookScreen.classList.toggle("active", name === "book");
+  updateLogScreen.classList.toggle("active", name === "log");
   isGameActive = name === "game";
   if (isGameActive) render();
 }
@@ -132,6 +148,8 @@ function makeUnit(type, side, lane, col) {
     maxHp: def.hp,
     cooldown: 0,
     alive: true,
+    age: 0,
+    hasTeleported: false,
   };
 }
 
@@ -184,6 +202,7 @@ function update(dt) {
     if (u.type === "walker" || u.type === "miniWalker") updateWalker(u, def, dt);
     else if (u.type === "ranger") updateRanger(u, def);
     else if (u.type === "marker") updateMarker(u, def, dt);
+    else if (u.type === "teleZoom") updateTeleZoom(u, def, dt);
   }
 
   resolveDeaths();
@@ -237,6 +256,26 @@ function updateWalker(u, def, dt) {
   }
 }
 
+
+function updateTeleZoom(u, def, dt) {
+  const dir = u.side === "player" ? 1 : -1;
+  u.age += dt;
+
+  if (!u.hasTeleported) {
+    if (u.age < def.teleportDelay) return;
+    u.hasTeleported = true;
+    u.x = u.side === "player" ? AI_WALL_COL - 3 : PLAYER_WALL_COL + 3;
+    for (const e of state.units) {
+      if (!e.alive || e.side === u.side) continue;
+      if (Math.abs(e.lane - u.lane) <= 1 && Math.abs(e.x - u.x) <= 1) {
+        e.hp -= def.teleportBlast;
+      }
+    }
+  }
+
+  u.x += dir * def.speed * dt;
+}
+
 function updateRanger(u, def) {
   if (u.cooldown > 0) return;
   const enemies = state.units
@@ -285,7 +324,7 @@ function resolveDeaths() {
 
 function checkWin() {
   for (const u of state.units) {
-    if (!u.alive || (u.type !== "walker" && u.type !== "miniWalker")) continue;
+    if (!u.alive || (u.type !== "walker" && u.type !== "miniWalker" && u.type !== "teleZoom")) continue;
     if (u.side === "player" && !state.walls.ai.alive && u.x >= COLS - 0.05) {
       state.over = true;
       state.winner = "player";
@@ -302,7 +341,7 @@ function aiAct() {
   if (state.over) return;
   const threats = new Array(LANES).fill(0);
   for (const u of state.units) {
-    if (!u.alive || u.side !== "player" || (u.type !== "walker" && u.type !== "miniWalker")) continue;
+    if (!u.alive || u.side !== "player" || (u.type !== "walker" && u.type !== "miniWalker" && u.type !== "teleZoom")) continue;
     threats[u.lane] += 1;
   }
   const dangerLane = threats.indexOf(Math.max(...threats));
@@ -435,6 +474,8 @@ function renderBotBook() {
     ["Unlock", def.unlock ?? "Default"],
     ["Laser DPS", def.laserDps ?? "-"],
     ["Death Blast", def.deathExplosion ?? "-"],
+    ["Teleport Delay", def.teleportDelay ? `${def.teleportDelay}s` : "-"],
+    ["Teleport Blast", def.teleportBlast ?? "-"],
   ];
 
   botDetailsEl.innerHTML = `
@@ -486,7 +527,9 @@ document.getElementById("bot-book-btn").addEventListener("pointerdown", () => {
   showScreen("book");
 });
 
+document.getElementById("update-log-btn").addEventListener("pointerdown", () => showScreen("log"));
 document.getElementById("book-back").addEventListener("pointerdown", () => showScreen("menu"));
+document.getElementById("log-back").addEventListener("pointerdown", () => showScreen("menu"));
 document.getElementById("menu-from-game").addEventListener("pointerdown", () => showScreen("menu"));
 
 window.addEventListener("resize", render);
