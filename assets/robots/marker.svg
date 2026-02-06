@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 260" role="img" aria-label="Marker robot">
+  <style>
+    :root {
+      --shell: #f5f7ff;
+      --shell-dark: #c7d4e8;
+      --accent: #6fe6ff;
+      --accent-deep: #1f8cff;
+      --trim: #1b2338;
+      --core: #0b0f1a;
+    }
+    .float { animation: float 2.6s ease-in-out infinite; transform-origin: 90px 120px; }
+    .beam { animation: beam 1.4s ease-in-out infinite; }
+    .pulse { animation: pulse 2s ease-in-out infinite; }
+    .explode { animation: explode 3s ease-in-out infinite; transform-origin: 90px 230px; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes beam {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+    @keyframes explode {
+      0%, 60% { opacity: 0; transform: scale(0.6); }
+      70% { opacity: 0.9; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.4); }
+    }
+  </style>
+  <g class="float">
+    <ellipse cx="90" cy="244" rx="60" ry="12" fill="#0a1326" opacity="0.45" />
+    <g class="beam">
+      <rect x="84" y="12" width="12" height="230" rx="6" fill="var(--accent)" opacity="0.75" />
+      <circle cx="90" cy="242" r="18" fill="var(--accent)" opacity="0.35" />
+    </g>
+    <rect x="40" y="40" width="100" height="170" rx="30" fill="var(--shell)" stroke="var(--trim)" stroke-width="4" />
+    <rect x="64" y="84" width="52" height="38" rx="12" fill="var(--core)" />
+    <rect x="72" y="92" width="16" height="22" rx="6" fill="var(--accent)" class="pulse" />
+    <rect x="92" y="92" width="16" height="22" rx="6" fill="var(--accent)" class="pulse" />
+    <rect x="70" y="130" width="40" height="62" rx="16" fill="var(--accent-deep)" />
+    <rect x="48" y="60" width="16" height="24" rx="8" fill="var(--shell-dark)" />
+    <rect x="116" y="140" width="16" height="24" rx="8" fill="var(--shell-dark)" />
+    <rect x="40" y="210" width="100" height="14" rx="7" fill="var(--trim)" />
+    <circle cx="90" cy="226" r="12" fill="var(--accent)" class="pulse" />
+    <circle cx="90" cy="226" r="28" fill="none" stroke="var(--accent)" stroke-width="4" class="explode" />
+  </g>
+</svg>
