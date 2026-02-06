@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Robot Royale PvAI Prototype</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="hud top">
+        <div class="wall-card">
+          <span>Player Wall</span>
+          <div class="bar"><div id="player-wall-bar" class="fill player"></div></div>
+          <span id="player-wall-hp">2500 / 2500</span>
+        </div>
+        <div class="center-info">
+          <h1>Robot Royale</h1>
+          <p id="status">Destroy enemy wall, then cross with a Walker.</p>
+        </div>
+        <div class="wall-card">
+          <span>AI Wall</span>
+          <div class="bar"><div id="ai-wall-bar" class="fill ai"></div></div>
+          <span id="ai-wall-hp">2500 / 2500</span>
+        </div>
+      </header>
+
+      <main>
+        <canvas id="game" width="1280" height="720"></canvas>
+      </main>
+
+      <footer class="hud bottom">
+        <div class="bolts">Bolts: <strong id="player-bolts">200</strong> / 600</div>
+        <div class="unit-buttons">
+          <button data-unit="walker">Walker (100)</button>
+          <button data-unit="ranger">Ranger (125)</button>
+          <button data-unit="marker">Marker (125)</button>
+        </div>
+        <button id="restart">Restart</button>
+      </footer>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
