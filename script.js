@@ -24,7 +24,7 @@ const UNIT_DEFS = {
   },
   miniWalker: {
     cost: 50,
-    hp: 175,
+    hp: 150,
     speed: 1,
     damage: 75,
     attackRate: 4,
@@ -58,7 +58,7 @@ const UNIT_DEFS = {
     description: "Markers burn enemies in adjacent lanes, then explode on death to punish clustered pushes.",
   },
   teleZoom: {
-    cost: 200,
+    cost: 100,
     hp: 200,
     speed: 2 / 3,
     damage: 0,
@@ -67,9 +67,9 @@ const UNIT_DEFS = {
     letter: "TZ",
     color: "#a784ff",
     teleportDelay: 1,
-    teleportBlast: 200,
+    teleportBlast: 400,
     role: "Win-condition infiltrator",
-    description: "Tele-Zoom idles for 1 second, teleports to 3 tiles from the enemy wall, blasts a 3x3 area for 200 damage once, then advances 1 tile every 1.5s.",
+    description: "Tele-Zoom idles for 1 second, teleports to 3 tiles from the enemy wall, blasts a 3x3 area for 400 damage once, then advances 1 tile every 1.5s.",
   },
 };
 
