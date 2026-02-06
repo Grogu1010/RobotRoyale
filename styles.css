@@ -1,0 +1,131 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  touch-action: manipulation;
+}
+
+body {
+  margin: 0;
+  background: #09101f;
+  color: #e8f1ff;
+}
+
+#app {
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 0.35rem;
+  padding: 0.4rem;
+}
+
+.hud {
+  display: grid;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hud.top {
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.hud.bottom {
+  grid-template-columns: auto 1fr auto;
+}
+
+.wall-card {
+  background: #0f1c38;
+  border: 1px solid #2b4a91;
+  border-radius: 0.5rem;
+  padding: 0.3rem 0.45rem;
+  display: grid;
+  gap: 0.15rem;
+  font-size: 0.78rem;
+}
+
+.center-info {
+  text-align: center;
+  font-size: 0.74rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.bar {
+  width: 100%;
+  height: 8px;
+  background: #24355e;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+}
+
+.fill.player {
+  background: #43b047;
+}
+
+.fill.ai {
+  background: #d55757;
+}
+
+main {
+  min-height: 0;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 0.6rem;
+  border: 1px solid #2a4a8f;
+  background: #0b1730;
+}
+
+.unit-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+button {
+  border: 1px solid #4168bf;
+  border-radius: 0.45rem;
+  background: #122346;
+  color: #e8f1ff;
+  font-weight: 600;
+  padding: 0.42rem 0.55rem;
+  font-size: 0.76rem;
+}
+
+button.active {
+  outline: 2px solid #75d8ff;
+  background: #1a3d6f;
+}
+
+.bolts {
+  font-size: 0.85rem;
+}
+
+@media (orientation: portrait) {
+  #app::before {
+    content: "For best play, rotate phone to landscape.";
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.4rem;
+  }
+}
