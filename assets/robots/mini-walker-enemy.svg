@@ -1,23 +1,41 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" role="img" aria-label="Mini Walker robot enemy">
+  <defs>
+    <linearGradient id="mini-shell" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2b2f39" />
+      <stop offset="50%" stop-color="#1c2028" />
+      <stop offset="100%" stop-color="#10141b" />
+    </linearGradient>
+    <linearGradient id="mini-accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff9a9a" />
+      <stop offset="60%" stop-color="#ff3b3b" />
+      <stop offset="100%" stop-color="#b21414" />
+    </linearGradient>
+    <radialGradient id="mini-eye" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#ffdede" />
+      <stop offset="70%" stop-color="#ff4d4d" />
+      <stop offset="100%" stop-color="#9a0f0f" />
+    </radialGradient>
+  </defs>
   <style>
     :root {
-      --shell: #1a1d25;
-      --shell-dark: #2b2f3a;
-      --accent: #ff4d4d;
-      --accent-deep: #b21414;
       --trim: #050608;
       --core: #0b0f1a;
     }
-    .bob { animation: bob 2s ease-in-out infinite; transform-origin: 110px 120px; }
-    .wheel { animation: spin 0.9s linear infinite; transform-origin: center; }
-    .drill { animation: spin 0.6s linear infinite; transform-origin: 174px 128px; }
-    .pulse { animation: pulse 1.6s ease-in-out infinite; }
+    .bob { animation: bob 1.8s ease-in-out infinite; transform-origin: 110px 130px; }
+    .wheel { animation: spin 0.8s linear infinite; transform-origin: center; }
+    .drill { animation: spin 0.45s linear infinite; transform-origin: 176px 128px; }
+    .eyes { animation: blink 2.8s ease-in-out infinite; }
+    .pulse { animation: pulse 1.4s ease-in-out infinite; }
     @keyframes bob {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
+      50% { transform: translateY(-5px); }
     }
     @keyframes spin {
       to { transform: rotate(360deg); }
+    }
+    @keyframes blink {
+      0%, 94%, 100% { transform: scaleY(1); }
+      96% { transform: scaleY(0.25); }
     }
     @keyframes pulse {
       0%, 100% { opacity: 0.6; }
@@ -25,31 +43,38 @@
     }
   </style>
   <g class="bob">
-    <ellipse cx="110" cy="196" rx="70" ry="10" fill="#05070d" opacity="0.55" />
-    <g>
-      <circle cx="70" cy="170" r="28" fill="var(--trim)" />
-      <circle cx="70" cy="170" r="20" fill="#0f1728" />
-      <circle cx="70" cy="170" r="10" fill="var(--accent)" class="wheel" />
+    <ellipse cx="110" cy="196" rx="72" ry="10" fill="#05070d" opacity="0.55" />
+    <g class="wheel">
+      <circle cx="70" cy="170" r="30" fill="#0a0d13" />
+      <circle cx="70" cy="170" r="22" fill="#070a10" />
+      <circle cx="70" cy="170" r="14" fill="#151a24" stroke="#1c2230" stroke-width="3" />
+      <circle cx="70" cy="170" r="8" fill="url(#mini-accent)" class="pulse" />
+    </g>
+    <g class="wheel">
+      <circle cx="150" cy="170" r="30" fill="#0a0d13" />
+      <circle cx="150" cy="170" r="22" fill="#070a10" />
+      <circle cx="150" cy="170" r="14" fill="#151a24" stroke="#1c2230" stroke-width="3" />
+      <circle cx="150" cy="170" r="8" fill="url(#mini-accent)" class="pulse" />
     </g>
     <g>
-      <circle cx="150" cy="170" r="28" fill="var(--trim)" />
-      <circle cx="150" cy="170" r="20" fill="#0f1728" />
-      <circle cx="150" cy="170" r="10" fill="var(--accent)" class="wheel" />
+      <rect x="56" y="90" width="108" height="76" rx="34" fill="url(#mini-shell)" stroke="var(--trim)" stroke-width="4" />
+      <rect x="90" y="90" width="40" height="76" rx="20" fill="url(#mini-accent)" />
+      <rect x="70" y="106" width="80" height="30" rx="16" fill="var(--core)" />
+      <g class="eyes">
+        <rect x="82" y="112" width="22" height="18" rx="8" fill="url(#mini-eye)" />
+        <rect x="116" y="112" width="22" height="18" rx="8" fill="url(#mini-eye)" />
+      </g>
+      <path d="M80 144 L140 144" stroke="#2b3957" stroke-width="6" opacity="0.4" />
+      <rect x="86" y="148" width="16" height="8" rx="4" fill="#ff6b6b" class="pulse" />
+      <rect x="118" y="148" width="16" height="8" rx="4" fill="#ff6b6b" class="pulse" />
     </g>
     <g>
-      <rect x="62" y="96" width="96" height="70" rx="32" fill="var(--shell)" stroke="var(--trim)" stroke-width="4" />
-      <rect x="88" y="96" width="44" height="70" rx="22" fill="var(--accent-deep)" />
-      <rect x="74" y="108" width="72" height="30" rx="16" fill="var(--core)" />
-      <rect x="84" y="116" width="20" height="18" rx="8" fill="var(--accent)" class="pulse" />
-      <rect x="116" y="116" width="20" height="18" rx="8" fill="var(--accent)" class="pulse" />
-    </g>
-    <g>
-      <rect x="38" y="118" width="32" height="42" rx="16" fill="var(--shell-dark)" stroke="var(--trim)" stroke-width="4" />
-      <rect x="150" y="118" width="32" height="42" rx="16" fill="var(--shell-dark)" stroke="var(--trim)" stroke-width="4" />
-      <circle cx="54" cy="150" r="12" fill="var(--trim)" />
+      <rect x="34" y="116" width="34" height="48" rx="16" fill="#2b303b" stroke="var(--trim)" stroke-width="4" />
+      <rect x="154" y="116" width="34" height="48" rx="16" fill="#2b303b" stroke="var(--trim)" stroke-width="4" />
+      <circle cx="52" cy="152" r="10" fill="#101724" />
       <g class="drill">
-        <polygon points="166,128 190,140 166,152" fill="var(--accent)" />
-        <rect x="156" y="134" width="16" height="12" rx="6" fill="var(--accent-deep)" />
+        <polygon points="172,126 198,140 172,154" fill="url(#mini-accent)" />
+        <rect x="162" y="134" width="14" height="12" rx="6" fill="#8f0c0c" />
       </g>
     </g>
   </g>

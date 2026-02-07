@@ -1,28 +1,46 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Ranger robot enemy">
+  <defs>
+    <linearGradient id="ranger-shell" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2c303a" />
+      <stop offset="55%" stop-color="#1c2028" />
+      <stop offset="100%" stop-color="#10141b" />
+    </linearGradient>
+    <linearGradient id="ranger-accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff9a9a" />
+      <stop offset="55%" stop-color="#ff3b3b" />
+      <stop offset="100%" stop-color="#b21414" />
+    </linearGradient>
+    <radialGradient id="ranger-eye" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#ffdede" />
+      <stop offset="70%" stop-color="#ff4d4d" />
+      <stop offset="100%" stop-color="#9a0f0f" />
+    </radialGradient>
+  </defs>
   <style>
     :root {
-      --shell: #1a1d25;
-      --shell-dark: #2b2f3a;
-      --accent: #ff4d4d;
-      --accent-deep: #b21414;
       --trim: #050608;
       --core: #0b0f1a;
     }
-    .float { animation: float 3s ease-in-out infinite; transform-origin: 120px 140px; }
-    .string { animation: shoot 1.2s ease-in-out infinite; transform-origin: 190px 130px; }
+    .float { animation: float 2.8s ease-in-out infinite; transform-origin: 120px 140px; }
+    .draw { animation: draw 1.2s ease-in-out infinite; transform-origin: 120px 140px; }
     .arrow { animation: arrow-glow 1.2s ease-in-out infinite; }
-    .glow { animation: pulse 2s ease-in-out infinite; }
+    .eyes { animation: blink 3s ease-in-out infinite; }
+    .core { animation: pulse 1.6s ease-in-out infinite; }
     @keyframes float {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
+      50% { transform: translateY(-7px); }
     }
-    @keyframes shoot {
-      0%, 100% { transform: rotate(0deg); }
-      50% { transform: rotate(-4deg); }
+    @keyframes draw {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(-4px); }
     }
     @keyframes arrow-glow {
       0%, 100% { opacity: 0.6; }
       50% { opacity: 1; }
+    }
+    @keyframes blink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      95% { transform: scaleY(0.2); }
     }
     @keyframes pulse {
       0%, 100% { opacity: 0.6; }
@@ -30,43 +48,47 @@
     }
   </style>
   <g class="float">
-    <ellipse cx="120" cy="206" rx="70" ry="12" fill="#04070f" opacity="0.55" />
+    <ellipse cx="120" cy="206" rx="72" ry="12" fill="#05070d" opacity="0.55" />
     <g>
-      <circle cx="120" cy="94" r="46" fill="var(--shell)" stroke="var(--trim)" stroke-width="4" />
-      <rect x="78" y="88" width="84" height="34" rx="16" fill="var(--core)" />
-      <rect x="90" y="96" width="22" height="20" rx="8" fill="var(--accent)" class="glow" />
-      <rect x="128" y="96" width="22" height="20" rx="8" fill="var(--accent)" class="glow" />
-      <rect x="70" y="80" width="20" height="32" rx="10" fill="var(--accent-deep)" />
-      <rect x="150" y="80" width="20" height="32" rx="10" fill="var(--accent-deep)" />
-      <polygon points="120,36 132,70 108,70" fill="var(--accent)" stroke="var(--trim)" stroke-width="3" />
+      <circle cx="120" cy="92" r="48" fill="url(#ranger-shell)" stroke="var(--trim)" stroke-width="4" />
+      <rect x="78" y="86" width="84" height="34" rx="16" fill="var(--core)" />
+      <g class="eyes">
+        <rect x="90" y="94" width="22" height="20" rx="8" fill="url(#ranger-eye)" />
+        <rect x="128" y="94" width="22" height="20" rx="8" fill="url(#ranger-eye)" />
+      </g>
+      <rect x="72" y="72" width="20" height="36" rx="10" fill="url(#ranger-accent)" />
+      <rect x="148" y="72" width="20" height="36" rx="10" fill="url(#ranger-accent)" />
+      <polygon points="120,32 136,72 104,72" fill="url(#ranger-accent)" stroke="var(--trim)" stroke-width="3" />
+      <path d="M94 120 L146 120" stroke="#2a3654" stroke-width="6" opacity="0.4" />
     </g>
     <g>
-      <rect x="82" y="132" width="76" height="54" rx="20" fill="var(--shell)" stroke="var(--trim)" stroke-width="4" />
-      <rect x="110" y="132" width="20" height="54" rx="10" fill="var(--accent-deep)" />
-      <rect x="90" y="172" width="60" height="16" rx="8" fill="var(--shell-dark)" />
+      <rect x="80" y="132" width="80" height="56" rx="22" fill="url(#ranger-shell)" stroke="var(--trim)" stroke-width="4" />
+      <rect x="110" y="132" width="20" height="56" rx="10" fill="url(#ranger-accent)" />
+      <rect x="90" y="170" width="60" height="14" rx="7" fill="#2b303b" />
+      <rect x="104" y="150" width="32" height="10" rx="5" fill="#ff6b6b" class="core" />
     </g>
     <g>
-      <rect x="54" y="130" width="28" height="52" rx="14" fill="var(--shell-dark)" stroke="var(--trim)" stroke-width="4" />
-      <rect x="158" y="130" width="28" height="52" rx="14" fill="var(--shell-dark)" stroke="var(--trim)" stroke-width="4" />
-      <rect x="36" y="152" width="26" height="36" rx="12" fill="var(--shell)" stroke="var(--trim)" stroke-width="4" />
-      <rect x="178" y="152" width="26" height="36" rx="12" fill="var(--shell)" stroke="var(--trim)" stroke-width="4" />
+      <rect x="52" y="130" width="30" height="54" rx="14" fill="#2b303b" stroke="var(--trim)" stroke-width="4" />
+      <rect x="158" y="130" width="30" height="54" rx="14" fill="#2b303b" stroke="var(--trim)" stroke-width="4" />
+      <rect x="34" y="152" width="26" height="38" rx="12" fill="url(#ranger-shell)" stroke="var(--trim)" stroke-width="4" />
+      <rect x="180" y="152" width="26" height="38" rx="12" fill="url(#ranger-shell)" stroke="var(--trim)" stroke-width="4" />
     </g>
-    <g class="string">
-      <path d="M204 108 C218 130 218 150 204 170" fill="none" stroke="var(--shell)" stroke-width="10" />
-      <path d="M36 108 C22 130 22 150 36 170" fill="none" stroke="var(--shell)" stroke-width="10" />
-      <line x1="36" y1="108" x2="204" y2="170" stroke="var(--accent)" stroke-width="3" />
-      <line x1="36" y1="170" x2="204" y2="108" stroke="var(--accent)" stroke-width="3" />
+    <g class="draw">
+      <path d="M202 104 C220 130 220 154 202 180" fill="none" stroke="url(#ranger-shell)" stroke-width="10" />
+      <path d="M38 104 C20 130 20 154 38 180" fill="none" stroke="url(#ranger-shell)" stroke-width="10" />
+      <line x1="38" y1="104" x2="202" y2="180" stroke="url(#ranger-accent)" stroke-width="3" />
+      <line x1="38" y1="180" x2="202" y2="104" stroke="url(#ranger-accent)" stroke-width="3" />
       <g class="arrow">
-        <line x1="90" y1="138" x2="180" y2="138" stroke="var(--accent)" stroke-width="6" />
-        <polygon points="180,126 208,138 180,150" fill="var(--accent)" />
+        <line x1="92" y1="140" x2="182" y2="140" stroke="url(#ranger-accent)" stroke-width="6" />
+        <polygon points="182,128 210,140 182,152" fill="url(#ranger-accent)" />
       </g>
     </g>
     <g>
-      <rect x="40" y="118" width="42" height="32" rx="10" fill="var(--trim)" />
-      <rect x="158" y="118" width="42" height="32" rx="10" fill="var(--trim)" />
-      <circle cx="50" cy="120" r="6" fill="var(--accent)" />
-      <circle cx="60" cy="118" r="6" fill="var(--accent)" />
-      <circle cx="70" cy="116" r="6" fill="var(--accent)" />
+      <rect x="42" y="116" width="44" height="32" rx="10" fill="#0c111b" />
+      <rect x="154" y="116" width="44" height="32" rx="10" fill="#0c111b" />
+      <circle cx="54" cy="120" r="6" fill="#ff6b6b" />
+      <circle cx="64" cy="118" r="6" fill="#ff6b6b" />
+      <circle cx="74" cy="116" r="6" fill="#ff6b6b" />
     </g>
   </g>
 </svg>

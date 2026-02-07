@@ -1,23 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 260" role="img" aria-label="Marker robot enemy">
+  <defs>
+    <linearGradient id="marker-shell" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2c303a" />
+      <stop offset="55%" stop-color="#1c2028" />
+      <stop offset="100%" stop-color="#10141b" />
+    </linearGradient>
+    <linearGradient id="marker-accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff9a9a" />
+      <stop offset="60%" stop-color="#ff3b3b" />
+      <stop offset="100%" stop-color="#b21414" />
+    </linearGradient>
+    <radialGradient id="marker-eye" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#ffdede" />
+      <stop offset="70%" stop-color="#ff4d4d" />
+      <stop offset="100%" stop-color="#9a0f0f" />
+    </radialGradient>
+  </defs>
   <style>
     :root {
-      --shell: #1a1d25;
-      --shell-dark: #2b2f3a;
-      --accent: #ff4d4d;
-      --accent-deep: #b21414;
       --trim: #050608;
       --core: #0b0f1a;
     }
-    .float { animation: float 2.6s ease-in-out infinite; transform-origin: 90px 120px; }
-    .beam { animation: beam 1.4s ease-in-out infinite; }
-    .pulse { animation: pulse 2s ease-in-out infinite; }
+    .float { animation: float 2.4s ease-in-out infinite; transform-origin: 90px 140px; }
+    .beam { animation: beam 1.2s ease-in-out infinite; }
+    .pulse { animation: pulse 1.8s ease-in-out infinite; }
     .explode { animation: explode 3s ease-in-out infinite; transform-origin: 90px 230px; }
+    .eyes { animation: blink 3s ease-in-out infinite; }
     @keyframes float {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+      50% { transform: translateY(-9px); }
     }
     @keyframes beam {
-      0%, 100% { opacity: 0.5; }
+      0%, 100% { opacity: 0.4; }
       50% { opacity: 1; }
     }
     @keyframes pulse {
@@ -29,22 +43,29 @@
       70% { opacity: 0.9; transform: scale(1); }
       100% { opacity: 0; transform: scale(1.4); }
     }
+    @keyframes blink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      95% { transform: scaleY(0.2); }
+    }
   </style>
   <g class="float">
-    <ellipse cx="90" cy="244" rx="60" ry="12" fill="#05070d" opacity="0.55" />
+    <ellipse cx="90" cy="244" rx="62" ry="12" fill="#05070d" opacity="0.55" />
     <g class="beam">
-      <rect x="84" y="12" width="12" height="230" rx="6" fill="var(--accent)" opacity="0.75" />
-      <circle cx="90" cy="242" r="18" fill="var(--accent)" opacity="0.35" />
+      <rect x="82" y="10" width="16" height="232" rx="8" fill="url(#marker-accent)" opacity="0.75" />
+      <circle cx="90" cy="242" r="18" fill="url(#marker-accent)" opacity="0.3" />
     </g>
-    <rect x="40" y="40" width="100" height="170" rx="30" fill="var(--shell)" stroke="var(--trim)" stroke-width="4" />
-    <rect x="64" y="84" width="52" height="38" rx="12" fill="var(--core)" />
-    <rect x="72" y="92" width="16" height="22" rx="6" fill="var(--accent)" class="pulse" />
-    <rect x="92" y="92" width="16" height="22" rx="6" fill="var(--accent)" class="pulse" />
-    <rect x="70" y="130" width="40" height="62" rx="16" fill="var(--accent-deep)" />
-    <rect x="48" y="60" width="16" height="24" rx="8" fill="var(--shell-dark)" />
-    <rect x="116" y="140" width="16" height="24" rx="8" fill="var(--shell-dark)" />
-    <rect x="40" y="210" width="100" height="14" rx="7" fill="var(--trim)" />
-    <circle cx="90" cy="226" r="12" fill="var(--accent)" class="pulse" />
-    <circle cx="90" cy="226" r="28" fill="none" stroke="var(--accent)" stroke-width="4" class="explode" />
+    <rect x="36" y="38" width="108" height="176" rx="30" fill="url(#marker-shell)" stroke="var(--trim)" stroke-width="4" />
+    <rect x="58" y="80" width="64" height="40" rx="14" fill="var(--core)" />
+    <g class="eyes">
+      <rect x="68" y="90" width="18" height="22" rx="7" fill="url(#marker-eye)" />
+      <rect x="94" y="90" width="18" height="22" rx="7" fill="url(#marker-eye)" />
+    </g>
+    <rect x="66" y="130" width="48" height="72" rx="18" fill="url(#marker-accent)" />
+    <rect x="46" y="56" width="18" height="28" rx="9" fill="#2b303b" />
+    <rect x="116" y="140" width="18" height="28" rx="9" fill="#2b303b" />
+    <rect x="42" y="208" width="96" height="14" rx="7" fill="#0c111b" />
+    <circle cx="90" cy="226" r="12" fill="url(#marker-accent)" class="pulse" />
+    <circle cx="90" cy="226" r="30" fill="none" stroke="url(#marker-accent)" stroke-width="4" class="explode" />
+    <path d="M54 120 L126 120" stroke="#2a3654" stroke-width="6" opacity="0.4" />
   </g>
 </svg>
