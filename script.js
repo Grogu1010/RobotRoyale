@@ -5,8 +5,8 @@ const PLAYER_WALL_COL = 0;
 const AI_WALL_COL = COLS - 1;
 const MAX_WALL_HP = 2500;
 const BOLT_CAP = 600;
-const ECON_TICK = 2;
-const ECON_GAIN = 10;
+const ECON_TICK = 4;
+const ECON_GAIN = 50;
 
 const UNIT_DEFS = {
   walker: {
@@ -19,6 +19,7 @@ const UNIT_DEFS = {
     letter: "W",
     color: "#67d17a",
     role: "Frontline breaker",
+    cardCooldown: 3,
     unlock: "Default",
     description: "Walkers march forward and smash whatever blocks the lane. Best for finishing games once a wall falls.",
   },
@@ -32,6 +33,7 @@ const UNIT_DEFS = {
     letter: "MW",
     color: "#90ffa0",
     role: "Hyper rush",
+    cardCooldown: 2,
     unlock: "1 win",
     description: "Mini Walkers swarm fast. They hit four times as quickly with lighter damage, move twice as fast, and trade durability for speed.",
   },
@@ -44,6 +46,7 @@ const UNIT_DEFS = {
     letter: "R",
     color: "#73a8ff",
     role: "Lane control",
+    cardCooldown: 3,
     description: "Rangers lock down their lane from range and steadily chip units and walls.",
   },
   marker: {
@@ -55,6 +58,7 @@ const UNIT_DEFS = {
     laserDps: 235,
     deathExplosion: 300,
     role: "Cross-lane disruptor",
+    cardCooldown: 2,
     description: "Markers burn enemies in adjacent lanes, then explode on death to punish clustered pushes.",
   },
   blocker: {
@@ -67,6 +71,7 @@ const UNIT_DEFS = {
     letter: "B",
     color: "#97a9bb",
     role: "Pure wall",
+    cardCooldown: 10,
     description: "Blockers are immovable shields. They cannot move or attack, but they soak damage to stop a push.",
   },
   megaWalker: {
@@ -79,6 +84,7 @@ const UNIT_DEFS = {
     letter: "MX",
     color: "#64d8ff",
     role: "Siege titan",
+    cardCooldown: 20,
     description: "Mega Walkers hit for massive damage, but lumber forward at one-quarter Walker speed and attack three times slower.",
   },
   godMiniWalker: {
@@ -91,6 +97,7 @@ const UNIT_DEFS = {
     letter: "GMW",
     color: "#f8e36b",
     role: "Mythic rush",
+    cardCooldown: 2,
     description: "God Mini Walkers keep Walker durability and power but move and strike at Mini Walker speed.",
   },
   teleZoom: {
@@ -105,6 +112,7 @@ const UNIT_DEFS = {
     teleportDelay: 1.2,
     teleportBlast: 320,
     role: "Win-condition infiltrator",
+    cardCooldown: 20,
     description: "Tele-Zoom idles for 1.2 seconds, teleports to 3 tiles from the enemy wall, blasts a 3x1 area for 320 damage once, then advances 1 tile every 1.5s.",
   },
 };
@@ -207,6 +215,10 @@ const state = {
   aiBolts: 200,
   econTimer: 0,
   aiThinkTimer: 0,
+  cardCooldowns: {
+    player: {},
+    ai: {},
+  },
   walls: {
     player: { hp: MAX_WALL_HP, alive: true, col: PLAYER_WALL_COL },
     ai: { hp: MAX_WALL_HP, alive: true, col: AI_WALL_COL },
@@ -231,6 +243,10 @@ function reset() {
   state.aiBolts = 200;
   state.econTimer = 0;
   state.aiThinkTimer = 0;
+  state.cardCooldowns = {
+    player: {},
+    ai: {},
+  };
   state.walls.player = { hp: MAX_WALL_HP, alive: true, col: PLAYER_WALL_COL };
   state.walls.ai = { hp: MAX_WALL_HP, alive: true, col: AI_WALL_COL };
   setStatus("Destroy enemy wall, then cross with a Walker.");
@@ -276,6 +292,13 @@ function canPlace(side, lane, col) {
 function placeUnit(side, type, lane, col) {
   const def = UNIT_DEFS[type];
   if (!def || !canPlace(side, lane, col)) return false;
+  const cooldownRemaining = state.cardCooldowns[side]?.[type] ?? 0;
+  if (cooldownRemaining > 0) {
+    if (side === "player") {
+      setStatus(`${capitalize(type)} is on cooldown for ${cooldownRemaining.toFixed(1)}s.`);
+    }
+    return false;
+  }
   if (side === "player") {
     if (state.playerBolts < def.cost) return false;
     state.playerBolts -= def.cost;
@@ -284,6 +307,7 @@ function placeUnit(side, type, lane, col) {
     state.aiBolts -= def.cost;
   }
   state.units.push(makeUnit(type, side, lane, col));
+  state.cardCooldowns[side][type] = def.cardCooldown ?? 0;
   return true;
 }
 
@@ -305,6 +329,13 @@ function update(dt) {
   if (state.aiThinkTimer >= 1.8) {
     state.aiThinkTimer = 0;
     aiAct();
+  }
+
+  for (const side of ["player", "ai"]) {
+    for (const [type, cooldown] of Object.entries(state.cardCooldowns[side])) {
+      if (cooldown <= 0) continue;
+      state.cardCooldowns[side][type] = Math.max(0, cooldown - dt);
+    }
   }
 
   for (const u of state.units) {
@@ -390,6 +421,7 @@ function updateWalker(u, def, dt) {
 
 function updateTeleZoom(u, def, dt) {
   const dir = u.side === "player" ? 1 : -1;
+  const foeWall = state.walls[enemySide(u.side)];
 
   if (!u.hasTeleported) {
     if (u.age < def.teleportDelay) return;
@@ -402,6 +434,14 @@ function updateTeleZoom(u, def, dt) {
         e.hp -= def.teleportBlast;
       }
     }
+  }
+
+  const wallDist = (foeWall.col - u.x) * dir;
+  if (foeWall.alive) {
+    if (wallDist > 1.0) {
+      u.x += dir * def.speed * dt;
+    }
+    return;
   }
 
   u.x += dir * def.speed * dt;
@@ -698,6 +738,8 @@ function renderBotBook() {
   const def = UNIT_DEFS[selectedBot];
   const art = UNIT_ART[selectedBot];
   const statItems = [
+    ["Movement", def.moving ? "Moving" : "Static"],
+    ["Cooldown", def.cardCooldown !== undefined ? `${def.cardCooldown}s` : "-"],
     ["Cost", def.cost],
     ["HP", def.hp],
     ["Damage", def.damage ?? "-"],
@@ -708,7 +750,13 @@ function renderBotBook() {
     ["Death Blast", def.deathExplosion !== undefined ? def.deathExplosion : "-"],
     ["Teleport Delay", def.teleportDelay !== undefined ? `${def.teleportDelay}s` : "-"],
     ["Teleport Blast", def.teleportBlast !== undefined ? def.teleportBlast : "-"],
+    ["Categories", Array.isArray(def.categories) && def.categories.length ? def.categories.join(", ") : "n/a"],
   ];
+  const filteredStats = statItems.filter(([, val]) => {
+    if (val === "-" || val === "n/a") return false;
+    if (typeof val === "string" && val.trim().toLowerCase() === "n/a") return false;
+    return val !== undefined && val !== null;
+  });
 
   botDetailsEl.innerHTML = `
     <h3>${capitalize(selectedBot)}</h3>
@@ -728,7 +776,7 @@ function renderBotBook() {
         : ""
     }
     <div class="bot-stats">
-      ${statItems.map(([label, val]) => `<div class="bot-stat"><strong>${label}:</strong> ${val}</div>`).join("")}
+      ${filteredStats.map(([label, val]) => `<div class="bot-stat"><strong>${label}:</strong> ${val}</div>`).join("")}
     </div>
   `;
 }
