@@ -1,58 +1,99 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Walker robot enemy">
+  <defs>
+    <linearGradient id="walker-shell" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2c303a" />
+      <stop offset="45%" stop-color="#1b1f27" />
+      <stop offset="100%" stop-color="#0f1218" />
+    </linearGradient>
+    <linearGradient id="walker-shell-dark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3b404c" />
+      <stop offset="100%" stop-color="#1c202a" />
+    </linearGradient>
+    <linearGradient id="walker-accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff7a7a" />
+      <stop offset="55%" stop-color="#ff3b3b" />
+      <stop offset="100%" stop-color="#b21414" />
+    </linearGradient>
+    <radialGradient id="walker-eye" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#ffd1d1" />
+      <stop offset="70%" stop-color="#ff4d4d" />
+      <stop offset="100%" stop-color="#9a0f0f" />
+    </radialGradient>
+  </defs>
   <style>
     :root {
-      --shell: #1a1d25;
-      --shell-dark: #2b2f3a;
-      --accent: #ff4d4d;
-      --accent-deep: #b21414;
       --trim: #050608;
       --core: #0b0f1a;
+      --glow: #ff6b6b;
     }
-    .bob { animation: bob 1.6s ease-in-out infinite; transform-origin: 120px 120px; }
-    .wheel { animation: spin 0.7s linear infinite; transform-origin: center; }
-    .arm { animation: punch 1.3s ease-in-out infinite; transform-origin: 190px 140px; }
-    .pulse { animation: pulse 1.5s ease-in-out infinite; }
+    .bob { animation: bob 1.6s ease-in-out infinite; transform-origin: 120px 150px; }
+    .wheel { animation: spin 0.65s linear infinite; transform-origin: center; }
+    .arm { animation: punch 1.2s ease-in-out infinite; transform-origin: 192px 140px; }
+    .eyes { animation: blink 3.4s ease-in-out infinite; transform-origin: 120px 120px; }
+    .core { animation: core-pulse 1.4s ease-in-out infinite; }
+    .spark { animation: spark 1.4s ease-in-out infinite; }
     @keyframes bob {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
+      50% { transform: translateY(-6px); }
     }
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
     @keyframes punch {
       0%, 100% { transform: rotate(0deg); }
-      50% { transform: rotate(-8deg); }
+      45% { transform: rotate(-8deg); }
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.6; }
+    @keyframes blink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      94% { transform: scaleY(0.2); }
+    }
+    @keyframes core-pulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+    @keyframes spark {
+      0%, 100% { opacity: 0.4; }
       50% { opacity: 1; }
     }
   </style>
   <g class="bob">
-    <ellipse cx="120" cy="214" rx="78" ry="12" fill="#05070d" opacity="0.55" />
-    <g>
-      <circle cx="70" cy="188" r="34" fill="var(--trim)" />
-      <circle cx="70" cy="188" r="22" fill="#0f1728" />
-      <circle cx="70" cy="188" r="12" fill="var(--accent)" class="wheel" />
+    <ellipse cx="120" cy="214" rx="80" ry="12" fill="#05070d" opacity="0.55" />
+    <g class="wheel">
+      <circle cx="70" cy="188" r="34" fill="#0a0d13" />
+      <circle cx="70" cy="188" r="26" fill="#070a10" />
+      <circle cx="70" cy="188" r="18" fill="#151a24" stroke="#1c2230" stroke-width="3" />
+      <circle cx="70" cy="188" r="11" fill="url(#walker-accent)" class="core" />
+    </g>
+    <g class="wheel">
+      <circle cx="170" cy="188" r="34" fill="#0a0d13" />
+      <circle cx="170" cy="188" r="26" fill="#070a10" />
+      <circle cx="170" cy="188" r="18" fill="#151a24" stroke="#1c2230" stroke-width="3" />
+      <circle cx="170" cy="188" r="11" fill="url(#walker-accent)" class="core" />
     </g>
     <g>
-      <circle cx="170" cy="188" r="34" fill="var(--trim)" />
-      <circle cx="170" cy="188" r="22" fill="#0f1728" />
-      <circle cx="170" cy="188" r="12" fill="var(--accent)" class="wheel" />
+      <rect x="58" y="86" width="124" height="88" rx="32" fill="url(#walker-shell)" stroke="var(--trim)" stroke-width="4" />
+      <rect x="96" y="86" width="48" height="88" rx="20" fill="url(#walker-accent)" opacity="0.9" />
+      <rect x="78" y="102" width="84" height="34" rx="16" fill="var(--core)" />
+      <g class="eyes">
+        <rect x="90" y="110" width="24" height="20" rx="8" fill="url(#walker-eye)" />
+        <rect x="126" y="110" width="24" height="20" rx="8" fill="url(#walker-eye)" />
+      </g>
+      <path d="M80 142 C100 152 140 152 160 142" stroke="#27314d" stroke-width="6" fill="none" opacity="0.6" />
+      <rect x="70" y="150" width="24" height="10" rx="5" fill="#ff6b6b" class="spark" />
+      <rect x="146" y="150" width="24" height="10" rx="5" fill="#ff6b6b" class="spark" />
     </g>
-    <rect x="62" y="92" width="116" height="76" rx="30" fill="var(--shell)" stroke="var(--trim)" stroke-width="4" />
-    <rect x="100" y="92" width="40" height="76" rx="18" fill="var(--accent-deep)" />
-    <rect x="82" y="104" width="76" height="32" rx="16" fill="var(--core)" />
-    <rect x="92" y="112" width="22" height="20" rx="8" fill="var(--accent)" class="pulse" />
-    <rect x="126" y="112" width="22" height="20" rx="8" fill="var(--accent)" class="pulse" />
     <g>
-      <rect x="34" y="118" width="30" height="50" rx="16" fill="var(--shell-dark)" stroke="var(--trim)" stroke-width="4" />
-      <circle cx="44" cy="160" r="14" fill="var(--trim)" />
+      <rect x="28" y="112" width="34" height="58" rx="16" fill="url(#walker-shell-dark)" stroke="var(--trim)" stroke-width="4" />
+      <circle cx="46" cy="162" r="14" fill="#101621" stroke="#1c2230" stroke-width="3" />
+      <circle cx="46" cy="162" r="6" fill="url(#walker-accent)" class="core" />
     </g>
     <g class="arm">
-      <rect x="176" y="118" width="30" height="50" rx="16" fill="var(--shell-dark)" stroke="var(--trim)" stroke-width="4" />
-      <polygon points="196,142 226,152 196,162" fill="var(--accent)" />
-      <rect x="186" y="146" width="12" height="16" rx="6" fill="var(--accent-deep)" />
+      <rect x="178" y="112" width="34" height="58" rx="16" fill="url(#walker-shell-dark)" stroke="var(--trim)" stroke-width="4" />
+      <polygon points="196,132 230,152 196,172" fill="url(#walker-accent)" />
+      <rect x="188" y="144" width="14" height="18" rx="7" fill="#8f0c0c" />
+      <circle cx="188" cy="120" r="4" fill="#ff6b6b" />
     </g>
+    <path d="M72 94 L96 94" stroke="#ffffff" stroke-width="4" opacity="0.2" />
+    <path d="M140 94 L166 94" stroke="#ffffff" stroke-width="4" opacity="0.15" />
   </g>
 </svg>
