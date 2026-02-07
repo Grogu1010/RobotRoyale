@@ -11,9 +11,9 @@ const ECON_GAIN = 50;
 const UNIT_DEFS = {
   walker: {
     cost: 100,
-    hp: 750,
+    hp: 800,
     speed: 0.5,
-    damage: 150,
+    damage: 175,
     attackRate: 1,
     moving: true,
     letter: "W",
@@ -24,9 +24,9 @@ const UNIT_DEFS = {
   },
   miniWalker: {
     cost: 65,
-    hp: 1,
+    hp: 65,
     speed: 1,
-    damage: 75,
+    damage: 125,
     attackRate: 4,
     moving: true,
     letter: "MW",
@@ -36,10 +36,10 @@ const UNIT_DEFS = {
     description: "Mini Walkers swarm fast. They hit four times as quickly at half Walker damage, move twice as fast, and trade durability for speed.",
   },
   ranger: {
-    cost: 125,
+    cost: 100,
     hp: 1500,
     damage: 75,
-    attackRate: 0.5,
+    attackRate: 1 / 1.75,
     moving: false,
     letter: "R",
     color: "#73a8ff",
@@ -58,7 +58,7 @@ const UNIT_DEFS = {
     description: "Markers burn enemies in adjacent lanes, then explode on death to punish clustered pushes.",
   },
   teleZoom: {
-    cost: 100,
+    cost: 75,
     hp: 200,
     speed: 2 / 3,
     damage: 0,
@@ -66,10 +66,10 @@ const UNIT_DEFS = {
     moving: true,
     letter: "TZ",
     color: "#a784ff",
-    teleportDelay: 1,
-    teleportBlast: 400,
+    teleportDelay: 1.2,
+    teleportBlast: 320,
     role: "Win-condition infiltrator",
-    description: "Tele-Zoom idles for 1 second, teleports to 3 tiles from the enemy wall, blasts a 3x3 area for 400 damage once, then advances 1 tile every 1.5s.",
+    description: "Tele-Zoom idles for 1.2 seconds, teleports to 3 tiles from the enemy wall, blasts a 3x1 area for 320 damage once, then advances 1 tile every 1.5s.",
   },
 };
 
@@ -341,7 +341,7 @@ function updateTeleZoom(u, def, dt) {
     u.anim.teleport = ANIM_DURATIONS.teleport;
     for (const e of state.units) {
       if (!e.alive || e.side === u.side) continue;
-      if (Math.abs(e.lane - u.lane) <= 1 && Math.abs(e.x - u.x) <= 1) {
+      if (e.lane === u.lane && Math.abs(e.x - u.x) <= 1) {
         e.hp -= def.teleportBlast;
       }
     }
