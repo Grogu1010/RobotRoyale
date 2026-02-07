@@ -23,8 +23,8 @@ const UNIT_DEFS = {
     description: "Walkers march forward and smash whatever blocks the lane. Best for finishing games once a wall falls.",
   },
   miniWalker: {
-    cost: 50,
-    hp: 150,
+    cost: 65,
+    hp: 1,
     speed: 1,
     damage: 75,
     attackRate: 4,
