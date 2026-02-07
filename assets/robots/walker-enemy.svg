@@ -27,7 +27,7 @@
       --glow: #ff6b6b;
     }
     .bob { animation: bob 1.6s ease-in-out infinite; transform-origin: 120px 150px; }
-    .wheel { animation: spin 0.65s linear infinite; transform-origin: center; }
+    .wheel { animation: spin 0.65s linear infinite; transform-box: fill-box; transform-origin: center; }
     .arm { animation: punch 1.2s ease-in-out infinite; transform-origin: 192px 140px; }
     .eyes { animation: blink 3.4s ease-in-out infinite; transform-origin: 120px 120px; }
     .core { animation: core-pulse 1.4s ease-in-out infinite; }

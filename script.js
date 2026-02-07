@@ -39,8 +39,8 @@ const UNIT_DEFS = {
   },
   ranger: {
     cost: 100,
-    hp: 700,
-    damage: 75,
+    hp: 300,
+    damage: 100,
     attackRate: 1 / 1.75,
     moving: false,
     letter: "R",
@@ -57,13 +57,14 @@ const UNIT_DEFS = {
     color: "#f0a255",
     laserDps: 235,
     deathExplosion: 300,
+    deathExplosionArea: 2,
     role: "Cross-lane disruptor",
     cardCooldown: 2,
-    description: "Markers burn enemies in adjacent lanes, then explode on death to punish clustered pushes.",
+    description: "Markers burn enemies in adjacent lanes, then explode in a 5x5 area on death to punish clustered pushes.",
   },
   blocker: {
     cost: 80,
-    hp: 2250,
+    hp: 1750,
     speed: 0,
     damage: 0,
     attackRate: 0,
@@ -78,7 +79,7 @@ const UNIT_DEFS = {
     cost: 200,
     hp: 2400,
     speed: 0.125,
-    damage: 2250,
+    damage: 2500,
     attackRate: 1 / 3,
     moving: true,
     letter: "MX",
@@ -99,6 +100,19 @@ const UNIT_DEFS = {
     role: "Mythic rush",
     cardCooldown: 2,
     description: "God Mini Walkers keep Walker durability and power but move and strike at Mini Walker speed.",
+  },
+  godWalker: {
+    cost: 600,
+    hp: 2400,
+    speed: 0.5,
+    damage: 2500,
+    attackRate: 1,
+    moving: true,
+    letter: "GW",
+    color: "#f7d669",
+    role: "Divine siege",
+    cardCooldown: 25,
+    description: "God Walkers stride with Walker speed and strike rate but deliver Mega Walker-level damage and durability.",
   },
   teleZoom: {
     cost: 75,
@@ -159,6 +173,12 @@ const UNIT_ART = {
     ai: "assets/robots/god-mini-walker-enemy.svg",
     width: 220,
     height: 220,
+  },
+  godWalker: {
+    player: "assets/robots/god-walker.svg",
+    ai: "assets/robots/god-walker-enemy.svg",
+    width: 240,
+    height: 240,
   },
   teleZoom: {
     player: "assets/robots/tele-zoom.svg",
@@ -346,7 +366,7 @@ function update(dt) {
     u.age += dt;
     u.cooldown = Math.max(0, u.cooldown - dt);
 
-    if (u.type === "walker" || u.type === "miniWalker" || u.type === "megaWalker" || u.type === "godMiniWalker") {
+    if (u.type === "walker" || u.type === "miniWalker" || u.type === "megaWalker" || u.type === "godMiniWalker" || u.type === "godWalker") {
       updateWalker(u, def, dt);
     }
     else if (u.type === "ranger") updateRanger(u, def);
@@ -496,7 +516,10 @@ function resolveDeaths() {
       if (u.type === "marker") {
         for (const e of state.units) {
           if (!e.alive || e.side === u.side) continue;
-          if (Math.abs(e.lane - u.lane) <= 1 && Math.abs(e.x - u.x) <= 1) {
+          if (
+            Math.abs(e.lane - u.lane) <= UNIT_DEFS.marker.deathExplosionArea &&
+            Math.abs(e.x - u.x) <= UNIT_DEFS.marker.deathExplosionArea
+          ) {
             e.hp -= UNIT_DEFS.marker.deathExplosion;
           }
         }
@@ -513,6 +536,7 @@ function checkWin() {
         u.type !== "miniWalker" &&
         u.type !== "megaWalker" &&
         u.type !== "godMiniWalker" &&
+        u.type !== "godWalker" &&
         u.type !== "teleZoom")
     )
       continue;
@@ -532,7 +556,17 @@ function aiAct() {
   if (state.over) return;
   const threats = new Array(LANES).fill(0);
   for (const u of state.units) {
-    if (!u.alive || u.side !== "player" || (u.type !== "walker" && u.type !== "miniWalker" && u.type !== "teleZoom")) continue;
+    if (
+      !u.alive ||
+      u.side !== "player" ||
+      (u.type !== "walker" &&
+        u.type !== "miniWalker" &&
+        u.type !== "megaWalker" &&
+        u.type !== "godMiniWalker" &&
+        u.type !== "godWalker" &&
+        u.type !== "teleZoom")
+    )
+      continue;
     threats[u.lane] += 1;
   }
   const dangerLane = threats.indexOf(Math.max(...threats));
@@ -737,17 +771,22 @@ function renderBotBook() {
 
   const def = UNIT_DEFS[selectedBot];
   const art = UNIT_ART[selectedBot];
+  const damagePerSecond =
+    def.damage !== undefined && def.attackRate !== undefined && def.attackRate > 0
+      ? formatStat(def.damage * def.attackRate)
+      : "-";
   const statItems = [
     ["Movement", def.moving ? "Moving" : "Static"],
     ["Cooldown", def.cardCooldown !== undefined ? `${def.cardCooldown}s` : "-"],
     ["Cost", def.cost],
     ["HP", def.hp],
-    ["Damage", def.damage ?? "-"],
-    ["Attack Rate", def.attackRate !== undefined ? `${def.attackRate}/s` : "-"],
-    ["Speed", def.speed !== undefined ? def.speed : "-"],
+    ["Damage /s", damagePerSecond],
+    ["Attack Rate /s", def.attackRate !== undefined ? `${formatStat(def.attackRate)}` : "-"],
+    ["Speed (tiles/s)", def.speed !== undefined ? formatStat(def.speed) : "-"],
     ["Unlock", def.unlock ?? "Default"],
-    ["Laser DPS", def.laserDps !== undefined ? def.laserDps : "-"],
+    ["Laser /s", def.laserDps !== undefined ? formatStat(def.laserDps) : "-"],
     ["Death Blast", def.deathExplosion !== undefined ? def.deathExplosion : "-"],
+    ["Explosion Area", def.deathExplosionArea !== undefined ? `${def.deathExplosionArea * 2 + 1}x${def.deathExplosionArea * 2 + 1}` : "-"],
     ["Teleport Delay", def.teleportDelay !== undefined ? `${def.teleportDelay}s` : "-"],
     ["Teleport Blast", def.teleportBlast !== undefined ? def.teleportBlast : "-"],
     ["Categories", Array.isArray(def.categories) && def.categories.length ? def.categories.join(", ") : "n/a"],
@@ -783,6 +822,12 @@ function renderBotBook() {
 
 function capitalize(value) {
   return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function formatStat(value) {
+  if (value === undefined || value === null || Number.isNaN(value)) return "-";
+  const rounded = Math.round(value * 100) / 100;
+  return Number.isInteger(rounded) ? `${rounded}` : rounded.toFixed(2);
 }
 
 function handlePlace(ev) {

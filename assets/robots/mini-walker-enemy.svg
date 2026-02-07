@@ -22,7 +22,7 @@
       --core: #0b0f1a;
     }
     .bob { animation: bob 1.8s ease-in-out infinite; transform-origin: 110px 130px; }
-    .wheel { animation: spin 0.8s linear infinite; transform-origin: center; }
+    .wheel { animation: spin 0.8s linear infinite; transform-box: fill-box; transform-origin: center; }
     .drill { animation: spin 0.45s linear infinite; transform-origin: 176px 128px; }
     .eyes { animation: blink 2.8s ease-in-out infinite; }
     .pulse { animation: pulse 1.4s ease-in-out infinite; }
