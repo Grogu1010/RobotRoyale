@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Blocker enemy robot">
+  <defs>
+    <linearGradient id="blocker-shell" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1b26" />
+      <stop offset="55%" stop-color="#2c2f3f" />
+      <stop offset="100%" stop-color="#111622" />
+    </linearGradient>
+    <linearGradient id="blocker-core" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff8a8a" />
+      <stop offset="50%" stop-color="#ff4d5a" />
+      <stop offset="100%" stop-color="#c3122f" />
+    </linearGradient>
+    <radialGradient id="blocker-glow" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#ffcad0" stop-opacity="1" />
+      <stop offset="100%" stop-color="#ff4957" stop-opacity="0.2" />
+    </radialGradient>
+  </defs>
+  <style>
+    :root {
+      --trim: #0b0f18;
+      --shadow: #06080f;
+    }
+    .pulse { animation: pulse 1.8s ease-in-out infinite; transform-origin: 120px 128px; }
+    .shimmer { animation: shimmer 2.4s ease-in-out infinite; }
+    .barrier { animation: barrier 1.6s ease-in-out infinite; transform-origin: 120px 164px; }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.75; }
+      50% { transform: scale(1.06); opacity: 1; }
+    }
+    @keyframes shimmer {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 0.9; }
+    }
+    @keyframes barrier {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+  </style>
+  <ellipse cx="120" cy="214" rx="78" ry="12" fill="#06080f" opacity="0.55" />
+  <g class="barrier">
+    <rect x="52" y="42" width="136" height="162" rx="28" fill="url(#blocker-shell)" stroke="var(--trim)" stroke-width="4" />
+    <rect x="66" y="56" width="108" height="134" rx="24" fill="#0c111d" stroke="#1a2335" stroke-width="3" />
+    <rect x="78" y="68" width="84" height="110" rx="20" fill="url(#blocker-glow)" class="pulse" />
+    <rect x="92" y="86" width="56" height="74" rx="16" fill="#0b0f1a" stroke="#1b263b" stroke-width="2" />
+    <rect x="100" y="98" width="40" height="50" rx="12" fill="url(#blocker-core)" class="pulse" />
+    <g class="shimmer">
+      <rect x="66" y="70" width="108" height="10" rx="5" fill="#ff9aa6" opacity="0.35" />
+      <rect x="66" y="166" width="108" height="8" rx="4" fill="#ff6978" opacity="0.25" />
+    </g>
+  </g>
+</svg>
