@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" role="img" aria-label="God Mini Walker enemy robot">
+  <defs>
+    <linearGradient id="god-shell" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2a2020" />
+      <stop offset="50%" stop-color="#3d2b2b" />
+      <stop offset="100%" stop-color="#1b1212" />
+    </linearGradient>
+    <linearGradient id="god-core" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffb1b1" />
+      <stop offset="60%" stop-color="#ff5c63" />
+      <stop offset="100%" stop-color="#c31735" />
+    </linearGradient>
+    <radialGradient id="god-eye" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#ffe5e8" />
+      <stop offset="70%" stop-color="#ff9aa6" />
+      <stop offset="100%" stop-color="#ff4d5a" />
+    </radialGradient>
+  </defs>
+  <style>
+    :root {
+      --trim: #090b12;
+      --core: #080b14;
+    }
+    .bob { animation: bob 1s ease-in-out infinite; transform-origin: 110px 140px; }
+    .spin { animation: spin 0.5s linear infinite; transform-origin: center; }
+    .halo { animation: halo 1.4s ease-in-out infinite; transform-origin: 110px 40px; }
+    .blink { animation: blink 3s ease-in-out infinite; transform-origin: 110px 110px; }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes halo {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+    @keyframes blink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      94% { transform: scaleY(0.2); }
+    }
+  </style>
+  <g class="bob">
+    <ellipse cx="110" cy="198" rx="70" ry="10" fill="#06080f" opacity="0.55" />
+    <g class="halo">
+      <ellipse cx="110" cy="34" rx="44" ry="12" fill="none" stroke="#ff9aa6" stroke-width="6" />
+      <ellipse cx="110" cy="34" rx="34" ry="8" fill="none" stroke="#ffcad0" stroke-width="3" />
+    </g>
+    <g class="spin">
+      <circle cx="62" cy="164" r="22" fill="#0b101b" />
+      <circle cx="62" cy="164" r="14" fill="url(#god-core)" />
+    </g>
+    <g class="spin">
+      <circle cx="158" cy="164" r="22" fill="#0b101b" />
+      <circle cx="158" cy="164" r="14" fill="url(#god-core)" />
+    </g>
+    <rect x="60" y="84" width="100" height="80" rx="30" fill="url(#god-shell)" stroke="var(--trim)" stroke-width="4" />
+    <rect x="86" y="100" width="48" height="30" rx="15" fill="var(--core)" />
+    <g class="blink">
+      <rect x="92" y="106" width="16" height="18" rx="6" fill="url(#god-eye)" />
+      <rect x="112" y="106" width="16" height="18" rx="6" fill="url(#god-eye)" />
+    </g>
+    <rect x="96" y="132" width="28" height="16" rx="8" fill="url(#god-core)" />
+    <path d="M54 108 C40 120 40 140 54 152" stroke="#ff9aa6" stroke-width="6" fill="none" />
+    <path d="M166 108 C180 120 180 140 166 152" stroke="#ff9aa6" stroke-width="6" fill="none" />
+  </g>
+</svg>

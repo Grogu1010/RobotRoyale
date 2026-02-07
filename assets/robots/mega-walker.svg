@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 240" role="img" aria-label="Mega Walker robot">
+  <defs>
+    <linearGradient id="mega-hull" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f1fbff" />
+      <stop offset="45%" stop-color="#cfe6f6" />
+      <stop offset="100%" stop-color="#9bb6d6" />
+    </linearGradient>
+    <linearGradient id="mega-tread" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6fd8ff" />
+      <stop offset="60%" stop-color="#3aa7ff" />
+      <stop offset="100%" stop-color="#1a6dff" />
+    </linearGradient>
+    <radialGradient id="mega-core" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#e6fbff" />
+      <stop offset="70%" stop-color="#7bdcff" />
+      <stop offset="100%" stop-color="#1c7bff" />
+    </radialGradient>
+  </defs>
+  <style>
+    :root {
+      --trim: #19283c;
+      --dark: #0b1220;
+    }
+    .bob { animation: bob 2.4s ease-in-out infinite; transform-origin: 130px 150px; }
+    .tread { animation: tread 1.2s linear infinite; transform-origin: center; }
+    .core { animation: core 1.6s ease-in-out infinite; }
+    .cannon { animation: cannon 2.8s ease-in-out infinite; transform-origin: 196px 98px; }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    @keyframes tread {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes core {
+      0%, 100% { opacity: 0.65; }
+      50% { opacity: 1; }
+    }
+    @keyframes cannon {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(-6deg); }
+    }
+  </style>
+  <g class="bob">
+    <ellipse cx="130" cy="214" rx="86" ry="12" fill="#0a1324" opacity="0.45" />
+    <g class="tread">
+      <circle cx="70" cy="182" r="40" fill="#0f1626" />
+      <circle cx="70" cy="182" r="30" fill="#0a101d" />
+      <circle cx="70" cy="182" r="18" fill="url(#mega-tread)" class="core" />
+    </g>
+    <g class="tread">
+      <circle cx="190" cy="182" r="40" fill="#0f1626" />
+      <circle cx="190" cy="182" r="30" fill="#0a101d" />
+      <circle cx="190" cy="182" r="18" fill="url(#mega-tread)" class="core" />
+    </g>
+    <rect x="52" y="98" width="156" height="86" rx="30" fill="url(#mega-hull)" stroke="var(--trim)" stroke-width="4" />
+    <rect x="76" y="110" width="108" height="50" rx="20" fill="var(--dark)" stroke="#2b3d58" stroke-width="3" />
+    <rect x="106" y="122" width="48" height="26" rx="12" fill="url(#mega-core)" class="core" />
+    <g class="cannon">
+      <rect x="186" y="84" width="54" height="28" rx="12" fill="url(#mega-hull)" stroke="var(--trim)" stroke-width="4" />
+      <rect x="228" y="92" width="24" height="12" rx="6" fill="url(#mega-tread)" />
+    </g>
+    <rect x="48" y="82" width="40" height="64" rx="16" fill="#b8cadf" stroke="var(--trim)" stroke-width="4" />
+    <rect x="56" y="94" width="24" height="40" rx="10" fill="#0f1626" />
+  </g>
+</svg>
