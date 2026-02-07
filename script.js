@@ -13,7 +13,7 @@ const UNIT_DEFS = {
     cost: 100,
     hp: 800,
     speed: 0.5,
-    damage: 175,
+    damage: 200,
     attackRate: 1,
     moving: true,
     letter: "W",
@@ -24,7 +24,7 @@ const UNIT_DEFS = {
   },
   miniWalker: {
     cost: 65,
-    hp: 65,
+    hp: 100,
     speed: 1,
     damage: 125,
     attackRate: 4,
@@ -37,7 +37,7 @@ const UNIT_DEFS = {
   },
   ranger: {
     cost: 100,
-    hp: 1500,
+    hp: 700,
     damage: 75,
     attackRate: 1 / 1.75,
     moving: false,
@@ -52,10 +52,46 @@ const UNIT_DEFS = {
     moving: false,
     letter: "M",
     color: "#f0a255",
-    laserDps: 250,
+    laserDps: 235,
     deathExplosion: 300,
     role: "Cross-lane disruptor",
     description: "Markers burn enemies in adjacent lanes, then explode on death to punish clustered pushes.",
+  },
+  blocker: {
+    cost: 80,
+    hp: 2250,
+    speed: 0,
+    damage: 0,
+    attackRate: 0,
+    moving: false,
+    letter: "B",
+    color: "#97a9bb",
+    role: "Pure wall",
+    description: "Blockers are immovable shields. They cannot move or attack, but they soak damage to stop a push.",
+  },
+  megaWalker: {
+    cost: 20,
+    hp: 2400,
+    speed: 0.125,
+    damage: 22500,
+    attackRate: 1 / 3,
+    moving: true,
+    letter: "MX",
+    color: "#64d8ff",
+    role: "Siege titan",
+    description: "Mega Walkers hit for massive damage, but lumber forward at one-quarter Walker speed and attack three times slower.",
+  },
+  godMiniWalker: {
+    cost: 425,
+    hp: 800,
+    speed: 1,
+    damage: 175,
+    attackRate: 4,
+    moving: true,
+    letter: "GMW",
+    color: "#f8e36b",
+    role: "Mythic rush",
+    description: "God Mini Walkers keep Walker durability and power but move and strike at Mini Walker speed.",
   },
   teleZoom: {
     cost: 75,
@@ -97,6 +133,24 @@ const UNIT_ART = {
     ai: "assets/robots/marker-enemy.svg",
     width: 180,
     height: 260,
+  },
+  blocker: {
+    player: "assets/robots/blocker.svg",
+    ai: "assets/robots/blocker-enemy.svg",
+    width: 210,
+    height: 240,
+  },
+  megaWalker: {
+    player: "assets/robots/mega-walker.svg",
+    ai: "assets/robots/mega-walker-enemy.svg",
+    width: 260,
+    height: 240,
+  },
+  godMiniWalker: {
+    player: "assets/robots/god-mini-walker.svg",
+    ai: "assets/robots/god-mini-walker-enemy.svg",
+    width: 220,
+    height: 220,
   },
   teleZoom: {
     player: "assets/robots/tele-zoom.svg",
@@ -261,9 +315,12 @@ function update(dt) {
     u.age += dt;
     u.cooldown = Math.max(0, u.cooldown - dt);
 
-    if (u.type === "walker" || u.type === "miniWalker") updateWalker(u, def, dt);
+    if (u.type === "walker" || u.type === "miniWalker" || u.type === "megaWalker" || u.type === "godMiniWalker") {
+      updateWalker(u, def, dt);
+    }
     else if (u.type === "ranger") updateRanger(u, def);
     else if (u.type === "marker") updateMarker(u, def, dt);
+    else if (u.type === "blocker") updateBlocker(u, def);
     else if (u.type === "teleZoom") updateTeleZoom(u, def, dt);
 
     if (u.hp < prevHp) {
@@ -350,6 +407,11 @@ function updateTeleZoom(u, def, dt) {
   u.x += dir * def.speed * dt;
 }
 
+function updateBlocker(u, def) {
+  u.cooldown = 0;
+  u.anim.slam = 0;
+}
+
 function updateRanger(u, def) {
   if (u.cooldown > 0) return;
   const enemies = state.units
@@ -405,7 +467,15 @@ function resolveDeaths() {
 
 function checkWin() {
   for (const u of state.units) {
-    if (!u.alive || (u.type !== "walker" && u.type !== "miniWalker" && u.type !== "teleZoom")) continue;
+    if (
+      !u.alive ||
+      (u.type !== "walker" &&
+        u.type !== "miniWalker" &&
+        u.type !== "megaWalker" &&
+        u.type !== "godMiniWalker" &&
+        u.type !== "teleZoom")
+    )
+      continue;
     if (u.side === "player" && !state.walls.ai.alive && u.x >= COLS - 0.05) {
       state.over = true;
       state.winner = "player";
@@ -630,14 +700,14 @@ function renderBotBook() {
   const statItems = [
     ["Cost", def.cost],
     ["HP", def.hp],
-    ["Damage", def.damage ?? "-"] ,
-    ["Attack Rate", def.attackRate ? `${def.attackRate}/s` : "-"],
-    ["Speed", def.speed ?? "-"],
+    ["Damage", def.damage ?? "-"],
+    ["Attack Rate", def.attackRate !== undefined ? `${def.attackRate}/s` : "-"],
+    ["Speed", def.speed !== undefined ? def.speed : "-"],
     ["Unlock", def.unlock ?? "Default"],
-    ["Laser DPS", def.laserDps ?? "-"],
-    ["Death Blast", def.deathExplosion ?? "-"],
-    ["Teleport Delay", def.teleportDelay ? `${def.teleportDelay}s` : "-"],
-    ["Teleport Blast", def.teleportBlast ?? "-"],
+    ["Laser DPS", def.laserDps !== undefined ? def.laserDps : "-"],
+    ["Death Blast", def.deathExplosion !== undefined ? def.deathExplosion : "-"],
+    ["Teleport Delay", def.teleportDelay !== undefined ? `${def.teleportDelay}s` : "-"],
+    ["Teleport Blast", def.teleportBlast !== undefined ? def.teleportBlast : "-"],
   ];
 
   botDetailsEl.innerHTML = `
