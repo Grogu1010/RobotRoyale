@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="God Walker robot">
+  <defs>
+    <linearGradient id="god-shell" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff5d1" />
+      <stop offset="45%" stop-color="#f6df9a" />
+      <stop offset="100%" stop-color="#caa35d" />
+    </linearGradient>
+    <linearGradient id="god-shell-dark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f3d38a" />
+      <stop offset="100%" stop-color="#b78a4b" />
+    </linearGradient>
+    <linearGradient id="god-accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#fff7c9" />
+      <stop offset="55%" stop-color="#ffd46f" />
+      <stop offset="100%" stop-color="#f7b22b" />
+    </linearGradient>
+    <radialGradient id="god-eye" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#fff4cc" />
+      <stop offset="70%" stop-color="#ffd46f" />
+      <stop offset="100%" stop-color="#f79b22" />
+    </radialGradient>
+  </defs>
+  <style>
+    :root {
+      --trim: #33230c;
+      --core: #1a0f00;
+      --glow: #ffd46f;
+    }
+    .bob { animation: bob 1.6s ease-in-out infinite; transform-origin: 120px 150px; }
+    .wheel { animation: spin 0.65s linear infinite; transform-box: fill-box; transform-origin: center; }
+    .arm { animation: punch 1.2s ease-in-out infinite; transform-origin: 192px 140px; }
+    .eyes { animation: blink 3.4s ease-in-out infinite; transform-origin: 120px 120px; }
+    .core { animation: core-pulse 1.2s ease-in-out infinite; }
+    .spark { animation: spark 1.2s ease-in-out infinite; }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes punch {
+      0%, 100% { transform: rotate(0deg); }
+      45% { transform: rotate(-8deg); }
+    }
+    @keyframes blink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      94% { transform: scaleY(0.2); }
+    }
+    @keyframes core-pulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+    @keyframes spark {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+  </style>
+  <g class="bob">
+    <ellipse cx="120" cy="214" rx="80" ry="12" fill="#0a1326" opacity="0.4" />
+    <g class="wheel">
+      <circle cx="70" cy="188" r="34" fill="#2b1b08" />
+      <circle cx="70" cy="188" r="26" fill="#1c1206" />
+      <circle cx="70" cy="188" r="18" fill="#3b2a12" stroke="#4c3317" stroke-width="3" />
+      <circle cx="70" cy="188" r="11" fill="url(#god-accent)" class="core" />
+    </g>
+    <g class="wheel">
+      <circle cx="170" cy="188" r="34" fill="#2b1b08" />
+      <circle cx="170" cy="188" r="26" fill="#1c1206" />
+      <circle cx="170" cy="188" r="18" fill="#3b2a12" stroke="#4c3317" stroke-width="3" />
+      <circle cx="170" cy="188" r="11" fill="url(#god-accent)" class="core" />
+    </g>
+    <g>
+      <rect x="58" y="86" width="124" height="88" rx="32" fill="url(#god-shell)" stroke="var(--trim)" stroke-width="4" />
+      <rect x="96" y="86" width="48" height="88" rx="20" fill="url(#god-accent)" opacity="0.9" />
+      <rect x="78" y="102" width="84" height="34" rx="16" fill="var(--core)" />
+      <g class="eyes">
+        <rect x="90" y="110" width="24" height="20" rx="8" fill="url(#god-eye)" />
+        <rect x="126" y="110" width="24" height="20" rx="8" fill="url(#god-eye)" />
+      </g>
+      <path d="M80 142 C100 152 140 152 160 142" stroke="#3a2b14" stroke-width="6" fill="none" opacity="0.6" />
+      <rect x="70" y="150" width="24" height="10" rx="5" fill="#ffd46f" class="spark" />
+      <rect x="146" y="150" width="24" height="10" rx="5" fill="#ffd46f" class="spark" />
+      <path d="M88 80 L120 64 L152 80" fill="#f7b22b" stroke="#33230c" stroke-width="3" />
+    </g>
+    <g>
+      <rect x="28" y="112" width="34" height="58" rx="16" fill="url(#god-shell-dark)" stroke="var(--trim)" stroke-width="4" />
+      <circle cx="46" cy="162" r="14" fill="#2a1d0d" stroke="#3f2a12" stroke-width="3" />
+      <circle cx="46" cy="162" r="6" fill="url(#god-accent)" class="core" />
+    </g>
+    <g class="arm">
+      <rect x="178" y="112" width="34" height="58" rx="16" fill="url(#god-shell-dark)" stroke="var(--trim)" stroke-width="4" />
+      <polygon points="196,132 230,152 196,172" fill="url(#god-accent)" />
+      <rect x="188" y="144" width="14" height="18" rx="7" fill="#f7b22b" />
+      <circle cx="188" cy="120" r="4" fill="#ffd46f" />
+    </g>
+    <path d="M72 94 L96 94" stroke="#fff1c8" stroke-width="4" opacity="0.6" />
+    <path d="M140 94 L166 94" stroke="#fff1c8" stroke-width="4" opacity="0.4" />
+  </g>
+</svg>
