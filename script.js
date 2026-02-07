@@ -137,6 +137,13 @@ let selectedBot = "walker";
 let lastTs = performance.now();
 let isGameActive = false;
 
+const ANIM_DURATIONS = {
+  slam: 0.25,
+  shot: 0.25,
+  hit: 0.2,
+  teleport: 0.6,
+};
+
 const state = {
   over: false,
   winner: null,
@@ -193,6 +200,15 @@ function makeUnit(type, side, lane, col) {
     alive: true,
     age: 0,
     hasTeleported: false,
+    prevX: col,
+    isMoving: false,
+    anim: {
+      slam: 0,
+      shot: 0,
+      hit: 0,
+      teleport: 0,
+    },
+    shotTargetX: null,
   };
 }
 
@@ -240,12 +256,25 @@ function update(dt) {
   for (const u of state.units) {
     if (!u.alive) continue;
     const def = UNIT_DEFS[u.type];
+    const prevHp = u.hp;
+    const prevX = u.x;
+    u.age += dt;
     u.cooldown = Math.max(0, u.cooldown - dt);
 
     if (u.type === "walker" || u.type === "miniWalker") updateWalker(u, def, dt);
     else if (u.type === "ranger") updateRanger(u, def);
     else if (u.type === "marker") updateMarker(u, def, dt);
     else if (u.type === "teleZoom") updateTeleZoom(u, def, dt);
+
+    if (u.hp < prevHp) {
+      u.anim.hit = ANIM_DURATIONS.hit;
+    }
+    u.prevX = prevX;
+    u.isMoving = Math.abs(u.x - prevX) > 0.001;
+    u.anim.slam = Math.max(0, u.anim.slam - dt);
+    u.anim.shot = Math.max(0, u.anim.shot - dt);
+    u.anim.hit = Math.max(0, u.anim.hit - dt);
+    u.anim.teleport = Math.max(0, u.anim.teleport - dt);
   }
 
   resolveDeaths();
@@ -272,6 +301,7 @@ function updateWalker(u, def, dt) {
     if (u.cooldown <= 0) {
       frontEnemy.hp -= def.damage;
       u.cooldown = 1 / def.attackRate;
+      u.anim.slam = ANIM_DURATIONS.slam;
     }
     return;
   }
@@ -282,6 +312,7 @@ function updateWalker(u, def, dt) {
     if (u.cooldown <= 0) {
       foeWall.hp -= def.damage;
       u.cooldown = 1 / def.attackRate;
+      u.anim.slam = ANIM_DURATIONS.slam;
       if (foeWall.hp <= 0) {
         foeWall.hp = 0;
         foeWall.alive = false;
@@ -302,12 +333,12 @@ function updateWalker(u, def, dt) {
 
 function updateTeleZoom(u, def, dt) {
   const dir = u.side === "player" ? 1 : -1;
-  u.age += dt;
 
   if (!u.hasTeleported) {
     if (u.age < def.teleportDelay) return;
     u.hasTeleported = true;
     u.x = u.side === "player" ? AI_WALL_COL - 3 : PLAYER_WALL_COL + 3;
+    u.anim.teleport = ANIM_DURATIONS.teleport;
     for (const e of state.units) {
       if (!e.alive || e.side === u.side) continue;
       if (Math.abs(e.lane - u.lane) <= 1 && Math.abs(e.x - u.x) <= 1) {
@@ -328,6 +359,8 @@ function updateRanger(u, def) {
   if (enemies.length > 0) {
     enemies[0].hp -= def.damage;
     u.cooldown = 1 / def.attackRate;
+    u.anim.shot = ANIM_DURATIONS.shot;
+    u.shotTargetX = enemies[0].x;
     return;
   }
 
@@ -335,6 +368,8 @@ function updateRanger(u, def) {
   if (foeWall.alive) {
     foeWall.hp -= def.damage;
     u.cooldown = 1 / def.attackRate;
+    u.anim.shot = ANIM_DURATIONS.shot;
+    u.shotTargetX = foeWall.col;
     if (foeWall.hp <= 0) {
       foeWall.hp = 0;
       foeWall.alive = false;
@@ -346,6 +381,9 @@ function updateMarker(u, def, dt) {
   const targets = state.units.filter(
     (e) => e.alive && e.side !== u.side && e.lane !== u.lane && Math.abs(e.x - u.x) <= 0.45
   );
+  if (targets.length > 0) {
+    u.anim.shot = ANIM_DURATIONS.shot;
+  }
   for (const t of targets) t.hp -= def.laserDps * dt;
 }
 
@@ -465,6 +503,7 @@ function render() {
     const def = UNIT_DEFS[u.type];
     const x = (u.x + 0.5) * cellW;
     const y = (u.lane + 0.5) * cellH;
+    drawUnitEffects(u, x, y, cellW, cellH);
     if (!drawUnitArt(u, x, y, Math.min(cellW, cellH) * 0.9)) {
       ctx.fillStyle = u.side === "player" ? def.color : "#ff7c7c";
       ctx.beginPath();
@@ -495,6 +534,59 @@ function drawWall(side, cellW, h) {
   if (wall.alive) ctx.fillRect(x - width / 2, 0, width, h);
 }
 
+function drawUnitEffects(unit, x, y, cellW, cellH) {
+  if (unit.anim.hit > 0) {
+    const hitT = unit.anim.hit / ANIM_DURATIONS.hit;
+    ctx.save();
+    ctx.globalAlpha = 0.6 * hitT;
+    ctx.strokeStyle = unit.side === "player" ? "#9dffb0" : "#ff9aa6";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(x, y, cellW * 0.25 + 10 * (1 - hitT), 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  if (unit.anim.teleport > 0) {
+    const tpT = unit.anim.teleport / ANIM_DURATIONS.teleport;
+    ctx.save();
+    ctx.globalAlpha = 0.5 * tpT;
+    ctx.strokeStyle = "#b58dff";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(x, y, cellW * 0.28 + 30 * (1 - tpT), 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  if (unit.anim.shot > 0 && unit.type === "ranger" && unit.shotTargetX !== null) {
+    const shotT = unit.anim.shot / ANIM_DURATIONS.shot;
+    const targetX = (unit.shotTargetX + 0.5) * cellW;
+    ctx.save();
+    ctx.globalAlpha = 0.8 * shotT;
+    ctx.strokeStyle = unit.side === "player" ? "#9cc7ff" : "#ff9aa6";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(targetX, y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  if (unit.anim.shot > 0 && unit.type === "marker") {
+    const beamT = unit.anim.shot / ANIM_DURATIONS.shot;
+    ctx.save();
+    ctx.globalAlpha = 0.6 * beamT;
+    ctx.strokeStyle = "#f7b676";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x, y - cellH * 0.35);
+    ctx.lineTo(x, y + cellH * 0.35);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
 function drawUnitArt(unit, x, y, size) {
   const art = UNIT_ART[unit.type];
   if (!art) return false;
@@ -503,9 +595,18 @@ function drawUnitArt(unit, x, y, size) {
   const scale = size / Math.max(art.width, art.height);
   const drawW = art.width * scale;
   const drawH = art.height * scale;
+  const bob = Math.sin(unit.age * 6 + unit.lane) * (unit.isMoving ? 4 : 1.6);
+  const slamT = unit.anim.slam > 0 ? unit.anim.slam / ANIM_DURATIONS.slam : 0;
+  const shotT = unit.anim.shot > 0 ? unit.anim.shot / ANIM_DURATIONS.shot : 0;
+  const slamKick = slamT > 0 ? Math.sin(slamT * Math.PI) : 0;
+  const shotKick = shotT > 0 ? Math.sin(shotT * Math.PI) : 0;
+  const recoilDir = unit.side === "player" ? -1 : 1;
+  const recoil = (slamKick * 6 + shotKick * 4) * recoilDir;
+  const scaleKick = 1 + slamKick * 0.05 + shotKick * 0.03;
   ctx.save();
-  ctx.translate(x, y);
+  ctx.translate(x + recoil, y + bob);
   if (unit.side === "ai") ctx.scale(-1, 1);
+  ctx.scale(scaleKick, scaleKick);
   ctx.drawImage(image, -drawW / 2, -drawH / 2, drawW, drawH);
   ctx.restore();
   return true;
