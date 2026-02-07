@@ -5,8 +5,8 @@ const PLAYER_WALL_COL = 0;
 const AI_WALL_COL = COLS - 1;
 const MAX_WALL_HP = 2500;
 const BOLT_CAP = 600;
-const ECON_TICK = 4;
-const ECON_GAIN = 50;
+const ECON_TICK = 2;
+const ECON_GAIN = 10;
 
 const UNIT_DEFS = {
   walker: {
