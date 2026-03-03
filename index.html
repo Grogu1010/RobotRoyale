@@ -14,8 +14,58 @@
         <p class="menu-copy">Choose your next move.</p>
         <div class="menu-actions">
           <button id="fight-btn" class="menu-btn">FIGHT!</button>
+          <button id="hyperdraw-btn" class="menu-btn">HyperDraw Lab</button>
           <button id="bot-book-btn" class="menu-btn alt">Bot Book</button>
           <button id="update-log-btn" class="menu-btn alt">Update Log</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="hyperdraw-screen" class="screen">
+      <div class="book-card hyperdraw-card">
+        <div class="book-header">
+          <h2>HyperDraw Dev Testing Seat</h2>
+          <button id="hyperdraw-back" class="menu-btn small">Back to Menu</button>
+        </div>
+
+        <p class="hyperdraw-copy">Sketch anything below and test HyperDraw models. HyperDraw_v2 maps to Model 7 in the dev menu.</p>
+
+        <div class="hyperdraw-controls">
+          <label>
+            Models
+            <select id="hyperdraw-model-select">
+              <option value="hyperdraw">HyperDraw</option>
+              <option value="hyperdraw_v2">HyperDraw_v2</option>
+            </select>
+          </label>
+          <label>
+            Dev Model Menu (All Builds)
+            <select id="hyperdraw-dev-model-select"></select>
+          </label>
+          <button id="hyperdraw-analyze-btn" class="menu-btn small">Analyze Drawing</button>
+          <button id="hyperdraw-compare-btn" class="menu-btn small alt">Compare</button>
+          <button id="hyperdraw-clear-btn" class="menu-btn small">Clear</button>
+        </div>
+
+        <canvas id="hyperdraw-canvas" width="900" height="360"></canvas>
+
+        <div id="hyperdraw-result" class="hyperdraw-result"></div>
+
+        <div id="hyperdraw-compare-grid" class="hyperdraw-compare-grid hidden"></div>
+      </div>
+    </div>
+
+    <div id="hyperdraw-intro-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <h2>INTRODUCING HYPERDRAWv2! Faster, Smarter, Better 😎</h2>
+        <p>HyperDraw_v2 is now live in the dev testing seat as Model 7.</p>
+        <div id="hyperdraw-more-info" class="hidden">
+          <p><strong>Old model:</strong> HyperDraw used a lighter stroke classifier that sampled fewer points and matched against a smaller pattern bank. It was solid, but struggled with messy lines and uncommon shapes.</p>
+          <p><strong>New model:</strong> HyperDraw_v2 runs a deeper shape pass with better stroke grouping, cleaner confidence scoring, and a wider pattern memory. That makes it quicker to lock in a result and more accurate on rough sketches.</p>
+        </div>
+        <div class="modal-actions">
+          <button id="hyperdraw-continue" class="menu-btn">Continue</button>
+          <button id="hyperdraw-more-info-btn" class="menu-btn alt">More Info</button>
         </div>
       </div>
     </div>

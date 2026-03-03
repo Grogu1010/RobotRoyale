@@ -211,13 +211,27 @@ const menuScreen = document.getElementById("menu-screen");
 const gameScreen = document.getElementById("game-screen");
 const botBookScreen = document.getElementById("bot-book-screen");
 const updateLogScreen = document.getElementById("update-log-screen");
+const hyperdrawScreen = document.getElementById("hyperdraw-screen");
 const botListEl = document.getElementById("bot-list");
 const botDetailsEl = document.getElementById("bot-details");
+const hyperdrawModal = document.getElementById("hyperdraw-intro-modal");
+const hyperdrawMoreInfo = document.getElementById("hyperdraw-more-info");
+const hyperdrawResultEl = document.getElementById("hyperdraw-result");
+const hyperdrawCompareEl = document.getElementById("hyperdraw-compare-grid");
+const hyperdrawCanvas = document.getElementById("hyperdraw-canvas");
+const hyperdrawCtx = hyperdrawCanvas.getContext("2d");
+const modelSelect = document.getElementById("hyperdraw-model-select");
+const devModelSelect = document.getElementById("hyperdraw-dev-model-select");
 
 let selectedUnit = "walker";
 let selectedBot = "walker";
 let lastTs = performance.now();
 let isGameActive = false;
+let hasSeenHyperdrawIntro = false;
+let isDrawing = false;
+let compareStats = { hyperdraw: 0, hyperdraw_v2: 0, ties: 0 };
+
+const DEV_MODELS = Array.from({ length: 7 }, (_, i) => `Model ${i + 1}`);
 
 const ANIM_DURATIONS = {
   slam: 0.25,
@@ -250,6 +264,7 @@ function showScreen(name) {
   gameScreen.classList.toggle("active", name === "game");
   botBookScreen.classList.toggle("active", name === "book");
   updateLogScreen.classList.toggle("active", name === "log");
+  hyperdrawScreen.classList.toggle("active", name === "hyperdraw");
   isGameActive = name === "game";
   if (isGameActive) render();
 }
@@ -861,6 +876,14 @@ document.getElementById("fight-btn").addEventListener("pointerdown", () => {
   showScreen("game");
 });
 
+document.getElementById("hyperdraw-btn").addEventListener("pointerdown", () => {
+  showScreen("hyperdraw");
+  if (!hasSeenHyperdrawIntro) {
+    hyperdrawModal.classList.remove("hidden");
+    hasSeenHyperdrawIntro = true;
+  }
+});
+
 document.getElementById("bot-book-btn").addEventListener("pointerdown", () => {
   renderBotBook();
   showScreen("book");
@@ -870,9 +893,21 @@ document.getElementById("update-log-btn").addEventListener("pointerdown", () => 
 document.getElementById("book-back").addEventListener("pointerdown", () => showScreen("menu"));
 document.getElementById("log-back").addEventListener("pointerdown", () => showScreen("menu"));
 document.getElementById("menu-from-game").addEventListener("pointerdown", () => showScreen("menu"));
+document.getElementById("hyperdraw-back").addEventListener("pointerdown", () => showScreen("menu"));
+document.getElementById("hyperdraw-continue").addEventListener("pointerdown", () => hyperdrawModal.classList.add("hidden"));
+document.getElementById("hyperdraw-more-info-btn").addEventListener("pointerdown", () => hyperdrawMoreInfo.classList.toggle("hidden"));
+document.getElementById("hyperdraw-analyze-btn").addEventListener("pointerdown", renderSingleResult);
+document.getElementById("hyperdraw-compare-btn").addEventListener("pointerdown", renderCompare);
+document.getElementById("hyperdraw-clear-btn").addEventListener("pointerdown", () => { drawHyperdrawGrid(); hyperdrawResultEl.textContent = "Canvas cleared."; hyperdrawCompareEl.classList.add("hidden"); });
+modelSelect.addEventListener("change", syncModelSelectors);
+devModelSelect.addEventListener("change", () => { if (Number(devModelSelect.value) === 7) modelSelect.value = "hyperdraw_v2"; });
+hyperdrawCanvas.addEventListener("pointerdown", (ev) => { isDrawing = false; drawStroke(ev); });
+hyperdrawCanvas.addEventListener("pointermove", (ev) => { if (ev.buttons) drawStroke(ev); });
+window.addEventListener("pointerup", () => { isDrawing = false; });
 
 window.addEventListener("resize", render);
 
+setupHyperdraw();
 reset();
 syncHud();
 showScreen("menu");
@@ -884,3 +919,111 @@ function frame(ts) {
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+
+
+function setupHyperdraw() {
+  DEV_MODELS.forEach((m, idx) => {
+    const opt = document.createElement("option");
+    opt.value = `${idx + 1}`;
+    opt.textContent = m;
+    devModelSelect.appendChild(opt);
+  });
+  devModelSelect.value = "7";
+  drawHyperdrawGrid();
+  syncModelSelectors();
+}
+
+function drawHyperdrawGrid() {
+  hyperdrawCtx.fillStyle = "#07152f";
+  hyperdrawCtx.fillRect(0, 0, hyperdrawCanvas.width, hyperdrawCanvas.height);
+  hyperdrawCtx.strokeStyle = "#1f3769";
+  for (let x = 0; x < hyperdrawCanvas.width; x += 30) {
+    hyperdrawCtx.beginPath();
+    hyperdrawCtx.moveTo(x, 0);
+    hyperdrawCtx.lineTo(x, hyperdrawCanvas.height);
+    hyperdrawCtx.stroke();
+  }
+  for (let y = 0; y < hyperdrawCanvas.height; y += 30) {
+    hyperdrawCtx.beginPath();
+    hyperdrawCtx.moveTo(0, y);
+    hyperdrawCtx.lineTo(hyperdrawCanvas.width, y);
+    hyperdrawCtx.stroke();
+  }
+}
+
+function syncModelSelectors() {
+  if (modelSelect.value === "hyperdraw_v2") devModelSelect.value = "7";
+  else if (devModelSelect.value === "7") devModelSelect.value = "1";
+}
+
+function modelFromSelection() {
+  const selected = modelSelect.value;
+  const dev = Number(devModelSelect.value);
+  if (selected === "hyperdraw_v2" || dev === 7) return "hyperdraw_v2";
+  return "hyperdraw";
+}
+
+function estimateStrokeComplexity() {
+  const pixels = hyperdrawCtx.getImageData(0, 0, hyperdrawCanvas.width, hyperdrawCanvas.height).data;
+  let ink = 0;
+  for (let i = 3; i < pixels.length; i += 4) if (pixels[i] > 0) ink += 1;
+  return ink / (hyperdrawCanvas.width * hyperdrawCanvas.height);
+}
+
+function runModel(modelName) {
+  const c = estimateStrokeComplexity();
+  if (c < 0.01) return { label: "No clear drawing detected", confidence: 0.2, speed: 0.05 };
+  if (modelName === "hyperdraw_v2") {
+    return {
+      label: c > 0.08 ? "Complex object" : "Simple sketch",
+      confidence: Math.min(0.99, 0.72 + c * 1.9),
+      speed: 0.9,
+    };
+  }
+  return {
+    label: c > 0.1 ? "Complex object" : "Simple sketch",
+    confidence: Math.min(0.95, 0.58 + c * 1.3),
+    speed: 0.62,
+  };
+}
+
+function renderSingleResult() {
+  const modelName = modelFromSelection();
+  const res = runModel(modelName);
+  hyperdrawCompareEl.classList.add("hidden");
+  hyperdrawResultEl.innerHTML = `<strong>${modelName === "hyperdraw_v2" ? "HyperDraw_v2" : "HyperDraw"}</strong>: ${res.label}<br/>Confidence: ${(res.confidence * 100).toFixed(1)}% · Speed Score: ${(res.speed * 100).toFixed(0)}%`;
+}
+
+function renderCompare() {
+  const oldRes = runModel("hyperdraw");
+  const newRes = runModel("hyperdraw_v2");
+  if (newRes.confidence > oldRes.confidence) compareStats.hyperdraw_v2 += 1;
+  else if (newRes.confidence < oldRes.confidence) compareStats.hyperdraw += 1;
+  else compareStats.ties += 1;
+
+  hyperdrawCompareEl.classList.remove("hidden");
+  hyperdrawCompareEl.innerHTML = `
+    <article class="compare-card"><h3>HyperDraw</h3><p>${oldRes.label}</p><p>Confidence: ${(oldRes.confidence * 100).toFixed(1)}%</p><p>Speed: ${(oldRes.speed * 100).toFixed(0)}%</p></article>
+    <article class="compare-card"><h3>HyperDraw_v2 (Model 7)</h3><p>${newRes.label}</p><p>Confidence: ${(newRes.confidence * 100).toFixed(1)}%</p><p>Speed: ${(newRes.speed * 100).toFixed(0)}%</p></article>
+    <article class="compare-card"><h3>Win Rates</h3><p>HyperDraw Wins: ${compareStats.hyperdraw}</p><p>HyperDraw_v2 Wins: ${compareStats.hyperdraw_v2}</p><p>Ties: ${compareStats.ties}</p></article>
+  `;
+  hyperdrawResultEl.textContent = "Compare mode active: drawing evaluated side-by-side.";
+}
+
+function drawStroke(ev) {
+  const rect = hyperdrawCanvas.getBoundingClientRect();
+  const x = ((ev.clientX - rect.left) / rect.width) * hyperdrawCanvas.width;
+  const y = ((ev.clientY - rect.top) / rect.height) * hyperdrawCanvas.height;
+  if (!isDrawing) {
+    hyperdrawCtx.beginPath();
+    hyperdrawCtx.moveTo(x, y);
+    isDrawing = true;
+    return;
+  }
+  hyperdrawCtx.strokeStyle = "#d7ecff";
+  hyperdrawCtx.lineWidth = 6;
+  hyperdrawCtx.lineCap = "round";
+  hyperdrawCtx.lineJoin = "round";
+  hyperdrawCtx.lineTo(x, y);
+  hyperdrawCtx.stroke();
+}
