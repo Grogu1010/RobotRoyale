@@ -55,7 +55,8 @@ body {
 
 #menu-screen,
 #bot-book-screen,
-#update-log-screen {
+#update-log-screen,
+#hyperdraw-screen {
   display: none;
   place-items: center;
   padding: 1rem;
@@ -64,7 +65,8 @@ body {
 
 #menu-screen.active,
 #bot-book-screen.active,
-#update-log-screen.active {
+#update-log-screen.active,
+#hyperdraw-screen.active {
   display: grid;
 }
 
@@ -525,4 +527,97 @@ button.active {
     padding: 0.3rem 0.45rem;
     font-size: 0.62rem;
   }
+}
+
+
+.hyperdraw-card {
+  width: min(96vw, 1040px);
+}
+
+.hyperdraw-copy {
+  margin: 0.2rem 0 0.9rem;
+  color: var(--muted);
+}
+
+.hyperdraw-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.6rem;
+  align-items: end;
+  margin-bottom: 0.75rem;
+}
+
+.hyperdraw-controls label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: #c9ddff;
+}
+
+.hyperdraw-controls select {
+  border: 1px solid #456ab8;
+  border-radius: 0.45rem;
+  background: #112447;
+  color: var(--text);
+  padding: 0.4rem;
+}
+
+#hyperdraw-canvas {
+  width: 100%;
+  height: 320px;
+  border-radius: 0.6rem;
+  border: 1px solid #456ab8;
+  background: #061127;
+  touch-action: none;
+}
+
+.hyperdraw-result {
+  margin-top: 0.7rem;
+  border: 1px solid #38588d;
+  border-radius: 0.6rem;
+  padding: 0.65rem;
+  background: #0f1c36;
+}
+
+.hyperdraw-compare-grid {
+  margin-top: 0.7rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.7rem;
+}
+
+.compare-card {
+  border: 1px solid #38588d;
+  border-radius: 0.6rem;
+  background: #0f1c36;
+  padding: 0.6rem;
+}
+
+.hidden { display: none !important; }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 8, 20, 0.8);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  z-index: 20;
+}
+
+.modal-card {
+  width: min(92vw, 700px);
+  border: 1px solid #4f79c8;
+  border-radius: 0.8rem;
+  background: linear-gradient(180deg, #152c54, #0d1b35);
+  padding: 1rem;
+}
+
+.modal-card h2 { margin-top: 0; }
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
 }
