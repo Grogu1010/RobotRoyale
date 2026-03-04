@@ -231,7 +231,81 @@ let hasSeenHyperdrawIntro = false;
 let isDrawing = false;
 let compareStats = { hyperdraw: 0, hyperdraw_v2: 0, ties: 0 };
 
-const DEV_MODELS = Array.from({ length: 7 }, (_, i) => `Model ${i + 1}`);
+const DEV_MODELS = Array.from({ length: 58 }, (_, i) => {
+  const id = i + 1;
+  if (id === 45) return "Model 45 · Alg 45";
+  if (id >= 52 && id <= 57) return `Model ${id} · Alg 45 Variant ${id - 51}`;
+  if (id === 58) return "Model 58 · Alg 45 Divergent";
+  return `Model ${id}`;
+});
+
+const MODEL_CONFIGS = {
+  45: {
+    architecture: "Alg 45",
+    labelThreshold: 0.087,
+    confidenceBase: 0.69,
+    confidenceScale: 1.62,
+    speed: 0.81,
+    confidenceCap: 0.985,
+  },
+  52: {
+    architecture: "Alg 45",
+    labelThreshold: 0.084,
+    confidenceBase: 0.7,
+    confidenceScale: 1.65,
+    speed: 0.83,
+    confidenceCap: 0.986,
+  },
+  53: {
+    architecture: "Alg 45",
+    labelThreshold: 0.09,
+    confidenceBase: 0.675,
+    confidenceScale: 1.72,
+    speed: 0.8,
+    confidenceCap: 0.986,
+  },
+  54: {
+    architecture: "Alg 45",
+    labelThreshold: 0.08,
+    confidenceBase: 0.685,
+    confidenceScale: 1.7,
+    speed: 0.84,
+    confidenceCap: 0.988,
+  },
+  55: {
+    architecture: "Alg 45",
+    labelThreshold: 0.093,
+    confidenceBase: 0.71,
+    confidenceScale: 1.58,
+    speed: 0.82,
+    confidenceCap: 0.985,
+  },
+  56: {
+    architecture: "Alg 45",
+    labelThreshold: 0.086,
+    confidenceBase: 0.702,
+    confidenceScale: 1.68,
+    speed: 0.85,
+    confidenceCap: 0.989,
+  },
+  57: {
+    architecture: "Alg 45",
+    labelThreshold: 0.089,
+    confidenceBase: 0.695,
+    confidenceScale: 1.66,
+    speed: 0.84,
+    confidenceCap: 0.987,
+  },
+  58: {
+    architecture: "Alg 45",
+    labelThreshold: 0.065,
+    confidenceBase: 0.62,
+    confidenceScale: 2.2,
+    speed: 0.74,
+    confidenceCap: 0.992,
+    adaptiveFloor: true,
+  },
+};
 
 const ANIM_DURATIONS = {
   slam: 0.25,
@@ -900,7 +974,11 @@ document.getElementById("hyperdraw-analyze-btn").addEventListener("pointerdown",
 document.getElementById("hyperdraw-compare-btn").addEventListener("pointerdown", renderCompare);
 document.getElementById("hyperdraw-clear-btn").addEventListener("pointerdown", () => { drawHyperdrawGrid(); hyperdrawResultEl.textContent = "Canvas cleared."; hyperdrawCompareEl.classList.add("hidden"); });
 modelSelect.addEventListener("change", syncModelSelectors);
-devModelSelect.addEventListener("change", () => { if (Number(devModelSelect.value) === 7) modelSelect.value = "hyperdraw_v2"; });
+devModelSelect.addEventListener("change", () => {
+  const devModel = Number(devModelSelect.value);
+  if (devModel === 7) modelSelect.value = "hyperdraw_v2";
+  else modelSelect.value = "hyperdraw";
+});
 hyperdrawCanvas.addEventListener("pointerdown", (ev) => { isDrawing = false; drawStroke(ev); });
 hyperdrawCanvas.addEventListener("pointermove", (ev) => { if (ev.buttons) drawStroke(ev); });
 window.addEventListener("pointerup", () => { isDrawing = false; });
@@ -957,10 +1035,9 @@ function syncModelSelectors() {
 }
 
 function modelFromSelection() {
-  const selected = modelSelect.value;
   const dev = Number(devModelSelect.value);
-  if (selected === "hyperdraw_v2" || dev === 7) return "hyperdraw_v2";
-  return "hyperdraw";
+  if (dev >= 1 && dev <= DEV_MODELS.length) return `model_${dev}`;
+  return modelSelect.value === "hyperdraw_v2" ? "model_7" : "model_1";
 }
 
 function estimateStrokeComplexity() {
@@ -971,9 +1048,22 @@ function estimateStrokeComplexity() {
 }
 
 function runModel(modelName) {
+  const modelId = Number(modelName.split("_")[1]);
   const c = estimateStrokeComplexity();
   if (c < 0.01) return { label: "No clear drawing detected", confidence: 0.2, speed: 0.05 };
-  if (modelName === "hyperdraw_v2") {
+
+  const alg45Profile = MODEL_CONFIGS[modelId];
+  if (alg45Profile) {
+    const adaptiveBoost = alg45Profile.adaptiveFloor ? Math.max(0, (c - 0.035) * 0.45) : 0;
+    return {
+      label: c > alg45Profile.labelThreshold ? "Complex object" : "Simple sketch",
+      confidence: Math.min(alg45Profile.confidenceCap, alg45Profile.confidenceBase + adaptiveBoost + c * alg45Profile.confidenceScale),
+      speed: alg45Profile.speed,
+      architecture: alg45Profile.architecture,
+    };
+  }
+
+  if (modelId === 7) {
     return {
       label: c > 0.08 ? "Complex object" : "Simple sketch",
       confidence: Math.min(0.99, 0.72 + c * 1.9),
@@ -988,15 +1078,17 @@ function runModel(modelName) {
 }
 
 function renderSingleResult() {
-  const modelName = modelFromSelection();
-  const res = runModel(modelName);
+  const selectedModel = modelFromSelection();
+  const modelId = Number(selectedModel.split("_")[1]);
+  const res = runModel(selectedModel);
   hyperdrawCompareEl.classList.add("hidden");
-  hyperdrawResultEl.innerHTML = `<strong>${modelName === "hyperdraw_v2" ? "HyperDraw_v2" : "HyperDraw"}</strong>: ${res.label}<br/>Confidence: ${(res.confidence * 100).toFixed(1)}% · Speed Score: ${(res.speed * 100).toFixed(0)}%`;
+  const architecture = res.architecture ? ` · ${res.architecture}` : "";
+  hyperdrawResultEl.innerHTML = `<strong>Model ${modelId}${architecture}</strong>: ${res.label}<br/>Confidence: ${(res.confidence * 100).toFixed(1)}% · Speed Score: ${(res.speed * 100).toFixed(0)}%`;
 }
 
 function renderCompare() {
-  const oldRes = runModel("hyperdraw");
-  const newRes = runModel("hyperdraw_v2");
+  const oldRes = runModel("model_1");
+  const newRes = runModel("model_7");
   if (newRes.confidence > oldRes.confidence) compareStats.hyperdraw_v2 += 1;
   else if (newRes.confidence < oldRes.confidence) compareStats.hyperdraw += 1;
   else compareStats.ties += 1;
